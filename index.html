@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SABINTA - The Right Solution For Your Needs</title>
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- FAVICON -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f4f6fc; display: flex; min-height: 100vh; color: #0f172a; overflow-x: hidden; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        :root { 
+            --shadow-sm: 0 1px 3px rgba(99,102,241,0.06), 0 1px 2px rgba(99,102,241,0.04);
+            --shadow-md: 0 4px 16px rgba(99,102,241,0.08), 0 2px 4px rgba(99,102,241,0.04);
+            --shadow-lg: 0 12px 40px rgba(99,102,241,0.10), 0 4px 12px rgba(99,102,241,0.05);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: rgba(99,102,241,0.08);
+            --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 270px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f172a 0%, #1a1f35 100%);
+            padding: 24px 12px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #e2e8f0;
+            box-shadow: 4px 0 40px rgba(0,0,0,0.3);
+            overscroll-behavior: contain;
+            border-right: 1px solid rgba(99,102,241,0.15);
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15,23,42,0.5); z-index: 999; display: none;
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        }
+        .sidebar-overlay.open { display: block; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; margin-bottom: 28px; color: white; padding-left: 10px; letter-spacing: -0.3px; }
+        .logo i { color: #fbbf24; font-size: 20px; }
+        .menu-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px;
+            margin-bottom: 2px; cursor: pointer; color: #94a3b8; transition: all 0.2s; text-decoration: none; font-size: 14px; font-weight: 500;
+            min-height: 46px; touch-action: manipulation;
+        }
+        .menu-item:hover { background: rgba(99,102,241,0.10); color: #e2e8f0; }
+        .menu-item.active { background: rgba(99,102,241,0.15); color: #e0e7ff; }
+        .menu-item i { width: 20px; text-align: center; font-size: 15px; }
+        .menu-header { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; margin: 20px 0 6px 14px; letter-spacing: 0.8px; }
+
+        /* --- HEADER --- */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(99,102,241,0.10);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 62px;
+        }
+        .top-header .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .hamburger {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            color: #0f172a;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: 0.2s;
+            touch-action: manipulation;
+            flex-shrink: 0;
+        }
+        .hamburger:hover { background: #f1f5f9; }
+        .page-title { 
+            font-size: 17px; 
+            font-weight: 700; 
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: -0.2px;
+        }
+        .date-badge { 
+            background: #f1f5f9; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            color: #475569; 
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            padding: 32px 24px calc(80px + var(--safe-bottom));
+            overflow-x: hidden;
+            background: #f4f6fc;
+            width: 100%;
+            max-width: 100%;
+        }
+        .page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .banner {
+            background: var(--primary-gradient);
+            color: white; 
+            padding: 28px 24px; 
+            border-radius: var(--radius); 
+            margin-bottom: 24px;
+            position: relative; 
+            overflow: hidden; 
+            box-shadow: var(--shadow-lg);
+        }
+        .banner h2 { font-size: 24px; margin-bottom: 6px; font-weight: 700; letter-spacing: -0.3px; }
+        .banner p { opacity: 0.9; font-size: 14px; }
+        .banner i { position: absolute; right: 10px; bottom: -30px; font-size: 120px; opacity: 0.10; transform: rotate(15deg); }
+
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 14px; 
+            margin-bottom: 24px; 
+        }
+        .stat-card {
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+        .stat-card:nth-child(1) { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .stat-card:nth-child(2) { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-card:nth-child(3) { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stat-card:nth-child(4) { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .stat-card:active { transform: scale(0.97); }
+        .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; opacity: 0.85; letter-spacing: 0.5px; }
+        .stat-value { 
+            font-size: 22px; 
+            font-weight: 700; 
+            margin: 6px 0; 
+            word-break: break-all;
+            white-space: normal;
+            overflow-wrap: break-word;
+            letter-spacing: -0.3px;
+        }
+        .stat-change { 
+            font-size: 10px; 
+            padding: 2px 8px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            background: rgba(255,255,255,0.2); 
+            display: inline-block; 
+        }
+
+        .bottom-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .widget-box { background: white; padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid rgba(99,102,241,0.06); transition: all 0.2s; }
+        .widget-box:hover { border-color: rgba(99,102,241,0.15); box-shadow: var(--shadow-md); }
+        .widget-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; color: #0f172a; }
+        .widget-sub { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+        .chart-area { height: 140px; display: flex; align-items: flex-end; gap: 6px; padding: 0; }
+        .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
+        .chart-bar { width: 100%; background: linear-gradient(180deg, #6366f1, #4f46e5); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .chart-col:nth-child(even) .chart-bar { background: linear-gradient(180deg, #8b5cf6, #7c3aed); }
+        .chart-label { font-size: 9px; color: #94a3b8; font-weight: 500; white-space: nowrap; margin-top: 4px; }
+
+        .activity-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; min-height: 56px; }
+        .activity-item:last-child { border-bottom: none; }
+        .icon-circle { 
+            width: 40px; height: 40px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            margin-right: 12px; color: white; flex-shrink: 0; 
+        }
+        .act-info { flex: 1; min-width: 0; }
+        .act-title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .act-date { font-size: 11px; color: #94a3b8; }
+        .act-amount { font-weight: 600; font-size: 14px; white-space: nowrap; }
+
+        .hidden-page { display: none; }
+        .hidden-page.active { display: block; }
+
+        .buku-list-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .buku-card {
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 64px;
+        }
+        .buku-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .buku-card:active { transform: scale(0.97); }
+        .buku-card .icon { font-size: 24px; opacity: 0.9; flex-shrink: 0; }
+        .buku-card .info { display: flex; flex-direction: column; overflow: hidden; }
+        .buku-card .nama { font-weight: 600; font-size: 13px; opacity: 0.95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .buku-card .saldo { font-size: 16px; font-weight: 700; margin-top: 2px; }
+        .buku-card .norek { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+        .buku-card .actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .buku-card:hover .actions { opacity: 1; }
+        .buku-card .actions button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .buku-card .actions button:active { background: rgba(255,255,255,0.4); }
+
+        .buku-card-add {
+            background: white !important;
+            border: 2px dashed #6366f1 !important;
+            box-shadow: none !important;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            min-height: 64px;
+            color: #6366f1;
+            transition: all 0.3s;
+        }
+        .buku-card-add:hover { background: rgba(99,102,241,0.04) !important; border-color: #4f46e5 !important; transform: translateY(-2px); }
+        .buku-card-add:active { transform: scale(0.97); }
+
+        .month-group { margin-bottom: 16px; }
+        .month-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            padding: 6px 0 10px 0;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .month-label span {
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .table-container { 
+            background: white; 
+            border-radius: var(--radius-sm); 
+            overflow-x: auto; 
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(99,102,241,0.06);
+            -webkit-overflow-scrolling: touch;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 13px; 
+            min-width: 600px;
+        }
+        th { text-align: left; padding: 14px 16px; background: #f4f6fc; color: #6366f1; font-weight: 600; border-bottom: 1px solid rgba(99,102,241,0.08); font-size: 11px; text-transform: uppercase; white-space: nowrap; letter-spacing: 0.5px; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        tr:hover td { background: rgba(99,102,241,0.02); }
+        tr:last-child td { border-bottom: none; }
+        .text-green { color: #059669; }
+        .text-red { color: #dc2626; }
+
+        /* --- BUTTONS --- */
+        .btn { 
+            padding: 11px 22px; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: white; 
+            min-height: 44px;
+            min-width: 44px;
+            justify-content: center;
+            touch-action: manipulation;
+            white-space: nowrap;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.20); }
+        .btn:active { transform: scale(0.96); box-shadow: none; }
+        .btn-warning { background: #f59e0b; }
+        .btn-danger { background: #ef4444; }
+        .btn-sm { padding: 8px 14px; font-size: 12px; min-height: 36px; min-width: 36px; border-radius: 8px; }
+        .btn-sm:active { transform: scale(0.96); }
+        .btn-success { background: #10b981; }
+        .btn-primary { background: var(--primary-gradient); }
+        .btn-cancel { background: #f1f5f9; color: #475569; }
+        .btn-cancel:hover { background: #e2e8f0; color: #0f172a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+
+        /* --- FLOATING ACTION BUTTON --- */
+        .fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            box-shadow: 0 6px 24px rgba(99,102,241,0.35);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            touch-action: manipulation;
+        }
+        .fab:hover { transform: scale(1.05); box-shadow: 0 8px 32px rgba(99,102,241,0.45); }
+        .fab:active { transform: scale(0.92); }
+
+        /* --- MODAL --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15,23,42,0.5); display: none; justify-content: center; align-items: center;
+            z-index: 500; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            padding: 16px;
+        }
+        .modal.open { display: flex; }
+        .modal-box {
+            background: white; width: 100%; max-width: 520px; border-radius: 20px;
+            padding: 28px; box-shadow: 0 24px 80px rgba(99,102,241,0.15); max-height: 85vh; overflow-y: auto;
+            animation: modalIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.93) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box h3 { font-size: 18px; color: #0f172a; font-weight: 700; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid rgba(99,102,241,0.10); }
+        .modal-box label { display: block; margin: 14px 0 4px; font-size: 13px; font-weight: 600; color: #475569; }
+        .modal-box input, .modal-box select, .modal-box textarea {
+            width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px;
+            font-size: 14px; margin-bottom: 6px; background: white; min-height: 46px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: #0f172a;
+        }
+        .modal-box input:focus, .modal-box select:focus, .modal-box textarea:focus {
+            border-color: #6366f1; outline: none; box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+        }
+        .modal-box input:hover, .modal-box select:hover { border-color: #a5b4fc; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+        .modal-actions .btn { flex: 1; }
+
+        .tag-status { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; display: inline-block; letter-spacing: 0.2px; }
+        .tag-lunas { background: #dcfce7; color: #16a34a; }
+        .tag-bayar { background: #fef2f2; color: #dc2626; }
+        .tag-pending { background: #fef9c3; color: #ca8a04; }
+
+        /* --- INVOICE FORM --- */
+        .invoice-form-card {
+            background: #f8fafc;
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .invoice-item-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .invoice-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px;
+        }
+        .invoice-item-header span { font-weight: 600; font-size: 12px; color: #475569; }
+        .invoice-row {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;
+        }
+        .invoice-row .full { grid-column: 1 / -1; }
+        .invoice-grand-total {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px;
+        }
+        .invoice-grand-total .label { font-size: 13px; font-weight: 600; }
+        .invoice-grand-total .value { font-size: 20px; font-weight: 700; }
+
+        /* --- INVOICE PREVIEW --- */
+        .invoice-preview {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 32px 28px;
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 13px;
+        }
+        .inv-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #6366f1;
+            margin-bottom: 20px;
+        }
+        .inv-preview-header .brand h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+        .inv-preview-header .brand h1 i {
+            color: #3b82f6;
+            margin-right: 8px;
+        }
+        .inv-preview-header .brand small {
+            font-size: 11px;
+            color: #94a3b8;
+            display: block;
+        }
+        .inv-preview-header .status-badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .inv-preview-header .status-badge.paid {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .inv-preview-header .status-badge.unpaid {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .inv-preview-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+        }
+        .inv-preview-meta .meta-group label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .inv-preview-meta .meta-group .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .inv-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .inv-preview-table th {
+            background: #0f172a;
+            color: white;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+        .inv-preview-table th:first-child { border-radius: 8px 0 0 0; }
+        .inv-preview-table th:last-child { border-radius: 0 8px 0 0; text-align: right; }
+        .inv-preview-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            color: #334155;
+        }
+        .inv-preview-table td:last-child { text-align: right; font-weight: 600; }
+        .inv-preview-table tr:last-child td { border-bottom: none; }
+        .inv-preview-total {
+            margin-top: 8px;
+            margin-left: auto;
+            width: 280px;
+            max-width: 100%;
+        }
+        .inv-preview-total .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #475569;
+        }
+        .inv-preview-total .total-row.grand {
+            padding: 12px 0;
+            border-top: 2px solid #0f172a;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .inv-preview-notes {
+            margin-top: 24px;
+            padding: 16px;
+            background: #fef9c3;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: #92400e;
+            display: none;
+        }
+        .inv-preview-notes.show { display: block; }
+        .inv-preview-notes strong { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; }
+        .inv-preview-footer {
+            text-align: center;
+            padding-top: 24px;
+            margin-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* --- INVOICE STATS --- */
+        .inv-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .inv-stat {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .inv-stat:hover { border-color: #cbd5e1; box-shadow: var(--shadow-sm); }
+        .inv-stat .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .inv-stat .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 6px;
+            letter-spacing: -0.3px;
+        }
+        .inv-stat .value.green { color: #10b981; }
+        .inv-stat .value.red { color: #ef4444; }
+        .inv-stat .value.indigo { color: #6366f1; }
+
+        /* --- INVOICE FILTER BAR --- */
+        .inv-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .inv-search {
+            position: relative;
+            flex: 1;
+            min-width: 180px;
+        }
+        .inv-search i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .inv-search input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            min-height: 42px;
+            transition: all 0.2s;
+            color: #0f172a;
+        }
+        .inv-search input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.10); }
+        .inv-search input:hover { border-color: #cbd5e1; }
+        .inv-search input::placeholder { color: #94a3b8; }
+        .inv-tabs {
+            display: flex;
+            gap: 3px;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 10px;
+        }
+        .inv-tab {
+            padding: 7px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .inv-tab:hover { color: #334155; }
+        .inv-tab.active {
+            background: white;
+            color: #6366f1;
+            box-shadow: 0 1px 4px rgba(99,102,241,0.15);
+        }
+        .inv-tab:active { transform: scale(0.96); }
+
+        /* --- INVOICE TABLE --- */
+        .inv-row { cursor: pointer; transition: 0.15s; }
+        .inv-row:hover { background: #f8fafc; }
+        .inv-row td { padding: 12px 12px; vertical-align: middle; }
+        .inv-row .inv-kode {
+            font-weight: 700;
+            font-size: 12px;
+            color: #6366f1;
+            white-space: nowrap;
+        }
+        .inv-row .inv-tgl {
+            font-size: 12px;
+            color: #475569;
+            white-space: nowrap;
+        }
+        .inv-row .inv-plg {
+            font-weight: 600;
+            font-size: 13px;
+            color: #0f172a;
+        }
+        .inv-row .inv-plg small {
+            display: block;
+            font-weight: 400;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .inv-row .inv-produk {
+            font-size: 12px;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        .inv-row .inv-total {
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+            text-align: right;
+        }
+        .inv-row .inv-status {
+            text-align: center;
+        }
+        .inv-row .inv-aksi {
+            text-align: center;
+        }
+        .inv-row .inv-aksi button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            color: #94a3b8;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .inv-row .inv-aksi button:hover { background: #f1f5f9; color: #0f172a; }
+
+        /* --- INVOICE PAGINATION --- */
+        .inv-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-size: 13px;
+            color: #64748b;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .inv-pagination .info { font-size: 12px; }
+        .inv-pagination .pages {
+            display: flex;
+            gap: 4px;
+        }
+        .inv-pagination .pages span {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #64748b;
+            transition: 0.2s;
+        }
+        .inv-pagination .pages span:hover { background: #f1f5f9; }
+        .inv-pagination .pages span.active {
+            background: #6366f1;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .inv-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .inv-filter-bar { flex-direction: column; align-items: stretch; }
+            .inv-search { min-width: auto; }
+            .inv-row .inv-produk { max-width: 100px; }
+            .inv-row .inv-aksi button { font-size: 11px; padding: 2px 6px; }
+        }
+        @media (max-width: 480px) {
+            .inv-stats-grid { grid-template-columns: 1fr; }
+        }
+
+        /* --- EXPORT BUTTONS --- */
+        .export-group {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .btn-export {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            min-height: 36px;
+            white-space: nowrap;
+        }
+        .btn-export:hover { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+        .btn-export:active { transform: scale(0.96); }
+
+        /* --- RESPONSIVE DESKTOP --- */
+        @media (min-width: 769px) {
+            .sidebar { left: 0 !important; position: sticky; top: 0; height: 100vh; }
+            .sidebar-overlay { display: none !important; }
+            .hamburger { display: none !important; }
+            .main-content { padding: 28px 36px; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .stat-value { font-size: 22px; }
+            .bottom-grid { grid-template-columns: 2fr 1fr; }
+            .buku-list-grid { grid-template-columns: repeat(3, 1fr); }
+            .invoice-row { grid-template-columns: 1fr 1fr; }
+            .invoice-row .full { grid-column: 1 / -1; }
+            .export-group { justify-content: flex-start; }
+            table { min-width: auto; }
+            .table-container { overflow-x: visible; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 20px 16px; }
+            .top-header { padding: 8px 16px; min-height: 56px; }
+            .top-header .page-title { font-size: 15px; }
+            .modal-box { padding: 20px; margin: 8px; border-radius: 16px; }
+            .modal-box input, .modal-box select, .modal-box textarea { padding: 10px 12px; font-size: 16px; min-height: 48px; }
+            .modal-box label { font-size: 13px; margin: 12px 0 3px; }
+            .modal-actions { flex-direction: column; gap: 8px; }
+            .modal-actions .btn { width: 100%; }
+            .banner { padding: 20px 16px; }
+            .banner h2 { font-size: 20px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 14px 16px; min-height: 80px; }
+            .stat-value { font-size: 18px; }
+            .stat-label { font-size: 9px; }
+            .bottom-grid { grid-template-columns: 1fr; }
+            .buku-list-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .buku-card { padding: 12px 14px; min-height: 56px; }
+            .buku-card .saldo { font-size: 14px; }
+            .invoice-row { grid-template-columns: 1fr 1fr; gap: 4px; }
+            .invoice-row .full { grid-column: 1 / -1; }
+            .table-container { border-radius: 10px; margin: 0 -4px; }
+            th, td { padding: 10px 10px; font-size: 12px; }
+            .fab { width: 52px; height: 52px; bottom: 20px; right: 20px; font-size: 20px; }
+            .inv-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+            .inv-stats-grid .stat-card { padding: 12px !important; min-height: 70px !important; }
+            .inv-list-actions { flex-direction: column; gap: 8px; }
+            .inv-list-actions .left-group, .inv-list-actions .right-group { flex-wrap: wrap; width: 100%; }
+            .inv-list-actions select, .inv-list-actions input { flex: 1; min-width: 120px; font-size: 14px; }
+            #page-invoice-list .table-container { overflow-x: auto; }
+            #page-invoice-list table { min-width: 700px; }
+            .export-group { flex-wrap: wrap; }
+            .btn { padding: 10px 16px; font-size: 13px; min-height: 42px; }
+            .btn-sm { padding: 7px 12px; font-size: 11px; min-height: 34px; }
+            .date-badge { font-size: 11px; padding: 4px 10px; }
+            .filter-tabs { gap: 4px; }
+            .filter-tab { padding: 6px 12px; font-size: 11px; }
+            .inv-preview-table th, .inv-preview-table td { padding: 8px 6px; font-size: 11px; }
+            .inv-preview-total { width: 220px !important; }
+            .inv-preview-total .total-row { font-size: 12px; padding: 4px 0; }
+            .inv-preview-total .total-row.grand { font-size: 15px; padding: 8px 0; }
+            .invoice-preview { padding: 16px !important; }
+            .inv-preview-header .status-badge { font-size: 9px; padding: 4px 10px; }
+            .inv-preview-meta { grid-template-columns: 1fr !important; gap: 8px !important; }
+            .inv-preview-meta .meta-group { text-align: left !important; }
+            .pagination { flex-wrap: wrap; gap: 4px; }
+            .pagination button { padding: 6px 10px; font-size: 11px; min-width: 30px; }
+            .widget-box { padding: 16px; }
+            .chart-area { height: 100px; }
+            .chart-area { height: 80px; }
+            .logo { font-size: 18px; margin-bottom: 20px; }
+            .menu-item { padding: 10px 12px; font-size: 13px; min-height: 42px; }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 16px 12px; }
+            .top-header { padding: 6px 12px; min-height: 50px; }
+            .top-header .page-title { font-size: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-value { font-size: 17px; }
+            .buku-list-grid { grid-template-columns: 1fr; }
+            .inv-stats-grid { grid-template-columns: 1fr 1fr !important; }
+            .modal-box { padding: 16px; margin: 4px; }
+            .invoice-row { grid-template-columns: 1fr; gap: 4px; }
+            .fab { width: 48px; height: 48px; bottom: 16px; right: 16px; font-size: 18px; }
+            .banner { padding: 16px 14px; border-radius: 12px; }
+            .banner h2 { font-size: 18px; margin-bottom: 4px; }
+            .banner p { font-size: 12px; }
+            .date-badge { display: none; }
+            .filter-tab { padding: 5px 10px; font-size: 10px; }
+            .btn { font-size: 12px; padding: 8px 14px; min-height: 38px; }
+            .inv-preview-total { width: 180px !important; }
+            .inv-preview-total .total-row { font-size: 11px; }
+            .inv-preview-total .total-row.grand { font-size: 14px; }
+            .invoice-preview { padding: 12px !important; }
+            .inv-preview-header .brand img { height: 24px !important; }
+            .inv-preview-header .brand div div:first-child { font-size: 16px !important; }
+        }
+
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            body { background: white !important; }
+            .sidebar, .sidebar-overlay, .top-header, .fab, .btn, .btn-export, .hamburger, .menu-item { display: none !important; }
+            .main-content { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+            .invoice-preview { box-shadow: none !important; border-radius: 0 !important; padding: 20px !important; max-width: 100% !important; }
+            .inv-preview-table th { background: #0f172a !important; color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .inv-preview-header .status-badge { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .inv-preview-meta { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            #page-invoice-detail .btn, #page-invoice-detail .btn-export { display: none !important; }
+            @page { margin: 15mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA" style="height:28px;border-radius:6px;"> SABINTA</div>
+        <div style="font-size:10px; color:#64748b; padding-left:8px; margin-top:-24px; margin-bottom:24px; letter-spacing:0.5px;">THE RIGHT SOLUTION FOR YOUR NEEDS</div>
+        <div class="menu-header">Menu</div>
+        <a href="#" class="menu-item active" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="#" class="menu-item" onclick="showPage('buku-kas')"><i class="fas fa-book"></i> Buku Kas</a>
+        <a href="#" class="menu-item" onclick="showPage('invoice')"><i class="fas fa-file-invoice"></i> Invoice</a>
+        <a href="#" class="menu-item" onclick="showPage('utang')"><i class="fas fa-hand-holding-usd"></i> Utang</a>
+        <a href="#" class="menu-item" onclick="showPage('piutang')"><i class="fas fa-hand-holding-dollar"></i> Piutang</a>
+        <a href="#" class="menu-item" onclick="showPage('laporan')"><i class="fas fa-chart-pie"></i> Laporan</a>
+        <div class="menu-header">Akun</div>
+        <a href="#" class="menu-item"><i class="fas fa-user-cog"></i> Pengaturan</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- HEADER -->
+        <div class="top-header">
+            <div class="left">
+                <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="page-title" id="pageTitle">Dashboard</div>
+            </div>
+            <div class="date-badge"><i class="far fa-calendar-alt"></i> <span id="tanggalHariIni"></span></div>
+        </div>
+
+        <div class="page-wrapper">
+        <!-- DASHBOARD -->
+        <div id="page-dashboard">
+            <div class="banner">
+                <div><h2>Selamat Datang!</h2><p>Pantau kesehatan finansial Anda dengan tampilan cerdas.</p></div>
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="bottom-grid">
+                <div class="widget-box">
+                    <div class="widget-title"><i class="fas fa-chart-line" style="color:#6366f1;"></i> Arus Kas</div>
+                    <div class="widget-sub">Performa bulanan</div>
+                    <div class="chart-area" id="chartArea"></div>
+                </div>
+                <div class="widget-box">
+                    <div class="widget-title"><i class="fas fa-bolt" style="color:#8b5cf6;"></i> Aktivitas Terbaru</div>
+                    <div class="widget-sub">Transaksi real-time</div>
+                    <div id="recentActivityList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUKU KAS -->
+        <div id="page-buku-kas" class="hidden-page">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;"><i class="fas fa-chevron-right" style="font-size:8px;"></i> KEUANGAN <i class="fas fa-chevron-right" style="font-size:8px;"></i> BUKU KAS</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Buku Kas</h2>
+                        <p style="font-size:13px; color:#64748b; margin-top:2px;">Kelola rekening, saldo, dan pantau arus kas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="buku-list-grid" id="bukuListGrid"></div>
+            <h4 style="font-size:16px; font-weight:600; color:#0f172a; margin-top:24px; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid rgba(99,102,241,0.08);"><i class="fas fa-chart-bar" style="color:#6366f1;"></i> Rincian per Rekening</h4>
+            <div id="rincianPerRekening"></div>
+        </div>
+
+        <!-- INVOICE -->
+        <div id="page-invoice" class="hidden-page">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;"><i class="fas fa-chevron-right" style="font-size:8px;"></i> KEUANGAN <i class="fas fa-chevron-right" style="font-size:8px;"></i> INVOICE</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Data Penjualan</h2>
+                        <p style="font-size:13px; color:#64748b; margin-top:2px;">Kelola invoice, pembayaran, dan riwayat pesanan pelanggan.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('invoice')"><i class="fas fa-plus"></i> Buat Invoice</button>
+                </div>
+            </div>
+
+            <div class="inv-stats-grid" id="invStatsGrid"></div>
+
+            <div class="inv-filter-bar">
+                <div class="inv-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="invSearchInput" placeholder="Nama Customer" oninput="renderInvoice()">
+                </div>
+                <div class="inv-tabs" id="invStatusTabs">
+                    <span class="inv-tab active" data-filter="all" onclick="filterInvoice('all')">SEMUA</span>
+                    <span class="inv-tab" data-filter="unpaid" onclick="filterInvoice('unpaid')">BELUM</span>
+                    <span class="inv-tab" data-filter="paid" onclick="filterInvoice('paid')">LUNAS</span>
+                </div>
+                <button class="btn-export" onclick="exportInvoiceExcel()" style="padding:8px 14px;font-size:12px;"><i class="fas fa-file-excel"></i> Export</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:140px;">KODE</th>
+                            <th style="width:100px;">TANGGAL</th>
+                            <th>PELANGGAN</th>
+                            <th>PRODUK</th>
+                            <th style="width:140px;text-align:right;">TOTAL</th>
+                            <th style="width:110px;text-align:center;">STATUS</th>
+                            <th style="width:160px;text-align:center;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="inv-pagination" id="invPagination"></div>
+        </div>
+
+        <!-- INVOICE DETAIL -->
+        <div id="page-invoice-detail" class="hidden-page">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+                <button class="btn btn-cancel btn-sm" onclick="goBackToInvoiceList()"><i class="fas fa-arrow-left"></i> Kembali</button>
+                <div style="font-weight:700; font-size:16px; color:#0f172a;" id="invoiceDetailTitle">Detail Invoice</div>
+                <div style="flex:1;"></div>
+                <button class="btn-export" onclick="openModal('invoice', currentInvoiceId)" style="background:#6366f1;"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn-export" onclick="window.print()" title="Cetak"><i class="fas fa-print"></i> Cetak</button>
+                <button class="btn-export" onclick="downloadInvoicePDF(currentInvoiceId)"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                <button class="btn-export" onclick="shareInvoice(currentInvoiceId)"><i class="fas fa-share-alt"></i> Share</button>
+            </div>
+            <div id="invoiceDetailContent"></div>
+        </div>
+
+        <!-- UTANG -->
+        <div id="page-utang" class="hidden-page">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;"><i class="fas fa-chevron-right" style="font-size:8px;"></i> KEUANGAN <i class="fas fa-chevron-right" style="font-size:8px;"></i> UTANG</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Utang</h2>
+                        <p style="font-size:13px; color:#64748b; margin-top:2px;">Catat dan pantau kewajiban pembayaran Anda.</p>
+                    </div>
+                    <button class="btn btn-success" onclick="openModal('utang')"><i class="fas fa-plus"></i> Tambah Utang</button>
+                </div>
+            </div>
+            <div id="listUtang"></div>
+        </div>
+
+        <!-- PIUTANG -->
+        <div id="page-piutang" class="hidden-page">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;"><i class="fas fa-chevron-right" style="font-size:8px;"></i> KEUANGAN <i class="fas fa-chevron-right" style="font-size:8px;"></i> PIUTANG</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Piutang</h2>
+                        <p style="font-size:13px; color:#64748b; margin-top:2px;">Pantau tagihan yang belum tertagih dari pelanggan.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('piutang')"><i class="fas fa-plus"></i> Tambah Piutang</button>
+                </div>
+            </div>
+            <div id="listPiutang"></div>
+        </div>
+
+        <!-- LAPORAN -->
+        <div id="page-laporan" class="hidden-page">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;"><i class="fas fa-chevron-right" style="font-size:8px;"></i> LAPORAN <i class="fas fa-chevron-right" style="font-size:8px;"></i> KEUANGAN</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Laporan Keuangan</h2>
+                        <p style="font-size:13px; color:#64748b; margin-top:2px;">Rekap pemasukan, pengeluaran, dan saldo secara ringkas.</p>
+                    </div>
+                    <div class="export-group">
+                        <button class="btn-export" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                        <button class="btn-export" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-grid" id="laporanStats" style="margin-bottom:14px;">
+                <div class="stat-card"><div class="stat-label">Total Pemasukan</div><div class="stat-value" id="totalPemasukan">Rp0</div></div>
+                <div class="stat-card"><div class="stat-label">Total Pengeluaran</div><div class="stat-value" id="totalPengeluaran">Rp0</div></div>
+                <div class="stat-card"><div class="stat-label">Saldo Akhir</div><div class="stat-value" id="saldoAkhirLaporan">Rp0</div></div>
+                <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="totalTransaksiLaporan">0</div></div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Tanggal</th><th>Buku Kas</th><th>Kategori</th><th>Nominal</th></tr></thead>
+                    <tbody id="laporanTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- FLOATING ACTION BUTTON -->
+    <button class="fab" onclick="openModal('transaksi')" title="Tambah Transaksi">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- MODAL -->
+    <div class="modal" id="modalTransaksi">
+        <div class="modal-box">
+            <h3 id="modalTitle">Form</h3>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn btn-primary" id="modalSaveBtn" onclick="saveModal()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div class="modal" id="modalPembayaran">
+        <div class="modal-box">
+            <h3 id="paymentModalTitle">Pembayaran Invoice</h3>
+            <div id="paymentModalBody"></div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closePaymentModal()">Batal</button>
+                <button class="btn btn-primary" id="paymentSaveBtn" onclick="confirmPayment()">Bayar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // DATA & STATE
+        // =============================================
+        let appData = {
+            bukuKas: [
+                { id: 'cash', nama: 'Cash', icon: 'fa-money-bill-wave', saldo: 2300000, norek: '-' },
+                { id: 'bri', nama: 'BRI', icon: 'fa-university', saldo: 5000000, norek: '683301012398536 a.n FITRIANTO' },
+                { id: 'shopeepay', nama: 'ShopeePay', icon: 'fa-mobile-alt', saldo: 1500000, norek: '083826271995' },
+                { id: 'qris', nama: 'QRIS', icon: 'fa-qrcode', saldo: 800000, norek: 'Scan QRIS di tempat' }
+            ],
+            transaksi: [],
+            utang: [],
+            piutang: [],
+            invoice: []
+        };
+
+        // Load dari localStorage
+        if (localStorage.getItem('sabintaPremiumData')) {
+            try {
+                const saved = JSON.parse(localStorage.getItem('sabintaPremiumData'));
+                appData = saved;
+            } catch(e) {}
+        } else {
+            appData.transaksi = [
+                { id: 't1', tanggal: '2026-06-01T09:00', bukuId: 'cash', tipe: 'masuk', nominal: 1000000, kategori: 'Penjualan Buku', desc: 'Buku Laskar Pelangi' },
+                { id: 't2', tanggal: '2026-06-01T10:30', bukuId: 'gopay', tipe: 'keluar', nominal: 50000, kategori: 'Makan', desc: 'Lunch' },
+                { id: 't3', tanggal: '2026-06-02T08:00', bukuId: 'bri', tipe: 'masuk', nominal: 2000000, kategori: 'Transfer', desc: 'Bayar piutang' },
+                { id: 't4', tanggal: '2026-06-02T12:15', bukuId: 'jenius', tipe: 'keluar', nominal: 75000, kategori: 'Pulsa', desc: 'Isi ulang' },
+                { id: 't5', tanggal: '2026-06-03T07:20', bukuId: 'qris', tipe: 'masuk', nominal: 450000, kategori: 'QRIS', desc: 'Pembayaran QRIS' }
+            ];
+            appData.utang = [
+                { id: 'u1', nama: 'Toko Maju', nominal: 500000, jatuhTempo: '2026-07-01', lunas: false },
+                { id: 'u2', nama: 'PT Sejahtera', nominal: 2000000, jatuhTempo: '2026-06-20', lunas: false }
+            ];
+            appData.piutang = [
+                { id: 'p1', nama: 'Andi Customer', nominal: 750000, jatuhTempo: '2026-06-15', lunas: false }
+            ];
+            appData.invoice = [
+                { id: 'inv1', nomor: 'INV-2026-001', customer: 'PT Maju Jaya', items: [{ nama: 'Jasa Desain', qty: 1, satuan: 'project', harga: 3000000, diskon: 0 }], jatuhTempo: '2026-06-30', status: 'unpaid', paymentAccountId: 'bri', metode: '', catatan: '' },
+                { id: 'inv2', nomor: 'INV-2026-002', customer: 'CV Sejahtera', items: [{ nama: 'Pengadaan Barang', qty: 5, satuan: 'pcs', harga: 300000, diskon: 0 }], jatuhTempo: '2026-06-15', status: 'paid', paymentAccountId: 'bri', metode: 'BRI', catatan: '' }
+            ];
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
+        }
+
+        // =============================================
+        // UTILITY
+        // =============================================
+        function formatRupiah(angka) {
+            return 'Rp' + angka.toLocaleString('id-ID');
+        }
+
+        function hitungTotalSaldo() {
+            return appData.bukuKas.reduce((sum, b) => sum + b.saldo, 0);
+        }
+
+        function getBukuName(id) {
+            const b = appData.bukuKas.find(b => b.id === id);
+            return b ? b.nama : '-';
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        const warnaBuku = ['#10b981','#6366f1','#8b5cf6','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316'];
+
+        function getWarnaBuku(index) {
+            return warnaBuku[index % warnaBuku.length];
+        }
+
+        function hitungTotalInvoice(items) {
+            return items.reduce((total, item) => {
+                const sub = (item.qty * item.harga) - item.diskon;
+                return total + sub;
+            }, 0);
+        }
+
+        // =============================================
+        // SIDEBAR TOGGLE
+        // =============================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        // =============================================
+        // RENDER
+        // =============================================
+        function renderDashboard() {
+            const totalSaldo = hitungTotalSaldo();
+            const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk').reduce((s, t) => s + t.nominal, 0);
+            const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar').reduce((s, t) => s + t.nominal, 0);
+            const totalUtang = appData.utang.filter(u => !u.lunas).reduce((s, u) => s + u.nominal, 0);
+            const totalInvoiceUnpaid = appData.invoice.filter(i => i.status === 'unpaid').reduce((s, i) => s + hitungTotalInvoice(i.items), 0);
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card"><div class="stat-label">Total Saldo</div><div class="stat-value">${formatRupiah(totalSaldo)}</div><span class="stat-change">+12%</span></div>
+                <div class="stat-card"><div class="stat-label">Pemasukan</div><div class="stat-value">${formatRupiah(totalPemasukan)}</div><span class="stat-change">+8%</span></div>
+                <div class="stat-card"><div class="stat-label">Pengeluaran</div><div class="stat-value">${formatRupiah(totalPengeluaran)}</div><span class="stat-change">-2%</span></div>
+                <div class="stat-card"><div class="stat-label">Invoice Unpaid</div><div class="stat-value">${formatRupiah(totalInvoiceUnpaid)}</div><span class="stat-change">0%</span></div>
+            `;
+
+            const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+            const now = new Date();
+            const chartData = months.map((m, i) => {
+                const txs = appData.transaksi.filter(t => {
+                    const d = new Date(t.tanggal);
+                    return d.getMonth() === i && d.getFullYear() === now.getFullYear() && t.tipe === 'masuk';
+                });
+                return { label: m, value: txs.reduce((s, t) => s + t.nominal, 0) };
+            });
+            const maxVal = Math.max(...chartData.map(d => d.value), 1);
+            document.getElementById('chartArea').innerHTML = chartData.map(d => {
+                const pct = Math.max(4, (d.value / maxVal) * 100);
+                return `<div class="chart-col"><div class="chart-bar" style="height:${pct}%;"></div><span class="chart-label">${d.label}</span></div>`;
+            }).join('');
+
+            const sorted = [...appData.transaksi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0,6);
+            const container = document.getElementById('recentActivityList');
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:16px;">Belum ada transaksi</div>';
+            } else {
+                container.innerHTML = sorted.map(t => {
+                    const isIncome = t.tipe === 'masuk';
+                    return `
+                        <div class="activity-item">
+                            <div class="icon-circle" style="background:${isIncome ? '#10b981' : '#ef4444'};">
+                                <i class="fas ${isIncome ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                            </div>
+                            <div class="act-info">
+                                <div class="act-title">${t.desc || t.kategori}</div>
+                                <div class="act-date">${getBukuName(t.bukuId)} • ${new Date(t.tanggal).toLocaleString('id-ID')}</div>
+                            </div>
+                            <div class="act-amount" style="color:${isIncome ? '#10b981' : '#ef4444'};">
+                                ${isIncome ? '+' : '-'}${formatRupiah(t.nominal)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderBukuKasList() {
+            const grid = document.getElementById('bukuListGrid');
+            grid.innerHTML = '';
+            if (appData.bukuKas.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:#94a3b8;"><i class="fas fa-wallet" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4;"></i><div style="font-weight:600;">Belum ada buku kas</div><button class="btn btn-primary btn-sm" onclick="openModal(\'buku\')" style="margin-top:12px;">Tambah Buku Kas</button></div>';
+                return;
+            }
+            appData.bukuKas.forEach((b, index) => {
+                const card = document.createElement('div');
+                card.className = 'buku-card';
+                card.style.background = getWarnaBuku(index);
+                card.innerHTML = `
+                    <div class="actions">
+                        <button onclick="event.stopPropagation(); editBuku('${b.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button onclick="event.stopPropagation(); hapusBuku('${b.id}')" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="icon"><i class="fas ${b.icon}"></i></div>
+                    <div class="info">
+                        <div class="nama">${b.nama}</div>
+                        <div class="saldo">${formatRupiah(b.saldo)}</div>
+                        <div class="norek">${b.norek ? '🏦 ' + b.norek : ''}</div>
+                    </div>
+                `;
+                card.onclick = () => showDetailRekening(b.id);
+                grid.appendChild(card);
+            });
+
+            const addCard = document.createElement('div');
+            addCard.className = 'buku-card buku-card-add';
+            addCard.style.background = 'white';
+            addCard.style.border = '2px dashed #6366f1';
+            addCard.style.boxShadow = 'none';
+            addCard.style.cursor = 'pointer';
+            addCard.style.display = 'flex';
+            addCard.style.alignItems = 'center';
+            addCard.style.justifyContent = 'center';
+            addCard.style.gap = '8px';
+            addCard.style.padding = '14px';
+            addCard.style.minHeight = '64px';
+            addCard.innerHTML = `
+                <div style="font-size:22px; color:#6366f1;"><i class="fas fa-plus-circle"></i></div>
+                <div style="font-size:12px; font-weight:600; color:#6366f1;">Tambah</div>
+            `;
+            addCard.onclick = () => openModal('buku');
+            grid.appendChild(addCard);
+        }
+
+        function renderRincianPerRekening(bukuId = null) {
+            const container = document.getElementById('rincianPerRekening');
+            let data = [...appData.transaksi];
+            if (bukuId) {
+                data = data.filter(t => t.bukuId === bukuId);
+            }
+            data.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+            if (data.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:16px;">Belum ada transaksi</div>';
+                return;
+            }
+
+            // Kelompokkan per buku kas
+            const groups = {};
+            data.forEach(t => {
+                if (!groups[t.bukuId]) {
+                    groups[t.bukuId] = {
+                        nama: getBukuName(t.bukuId),
+                        pemasukan: 0,
+                        pengeluaran: 0,
+                        transfer: 0,
+                        items: []
+                    };
+                }
+                if (t.tipe === 'masuk') groups[t.bukuId].pemasukan += t.nominal;
+                else if (t.tipe === 'keluar') groups[t.bukuId].pengeluaran += t.nominal;
+                groups[t.bukuId].items.push(t);
+            });
+
+            let html = '';
+            for (const key in groups) {
+                const g = groups[key];
+                html += `
+                    <div class="widget-box" style="margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+                            <div>
+                                <div style="font-weight:600; font-size:16px; color:#0f172a;">${g.nama}</div>
+                                <div style="margin-top:4px; font-size:12px; color:#64748b;">
+                                    <i class="fas fa-exchange-alt" style="margin-right:4px;color:#6366f1;"></i> ${g.items.length} transaksi
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:13px; color:#059669; font-weight:600;">+${formatRupiah(g.pemasukan)}</div>
+                                <div style="font-size:13px; color:#dc2626; font-weight:600;">-${formatRupiah(g.pengeluaran)}</div>
+                                <div style="margin-top:4px; padding-top:4px; border-top:1px solid #e2e8f0; font-size:14px; font-weight:700; color:#0f172a;">${formatRupiah(g.pemasukan - g.pengeluaran)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function showDetailRekening(bukuId) {
+            renderRincianPerRekening(bukuId);
+        }
+
+        function renderUtang() {
+            const listUtang = document.getElementById('listUtang');
+            if (appData.utang.length === 0) {
+                listUtang.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#94a3b8;"><i class="fas fa-inbox" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4;"></i><div style="font-weight:600;">Belum ada utang</div></div>';
+            } else {
+                listUtang.innerHTML = appData.utang.map(u => `
+                    <div class="widget-box" style="margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-weight:600;font-size:15px;color:#0f172a;">${u.nama}</div>
+                                <div style="font-size:12px;color:#64748b;margin-top:2px;"><i class="far fa-calendar-alt" style="margin-right:4px;"></i>Jatuh tempo: ${new Date(u.jatuhTempo).toLocaleDateString('id-ID')}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:700;font-size:17px;color:#0f172a;">${formatRupiah(u.nominal)}</div>
+                                <span class="tag-status ${u.lunas ? 'tag-lunas' : 'tag-bayar'}" style="${!u.lunas ? 'font-size:10px;padding:2px 8px;' : ''}">${u.lunas ? 'Lunas' : 'Belum'}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;display:flex;gap:6px;flex-wrap:wrap;">
+                            ${!u.lunas ? `<button onclick="bayarUtang('${u.id}')" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Bayar</button>` : `<button onclick="unbayarUtang('${u.id}')" class="btn btn-warning btn-sm"><i class="fas fa-undo"></i> Batal Lunas</button>`}
+                            <button onclick="editUtang('${u.id}')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+                            <button onclick="hapusUtang('${u.id}')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderPiutang() {
+            const listPiutang = document.getElementById('listPiutang');
+            if (appData.piutang.length === 0) {
+                listPiutang.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#94a3b8;"><i class="fas fa-inbox" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4;"></i><div style="font-weight:600;">Belum ada piutang</div></div>';
+            } else {
+                listPiutang.innerHTML = appData.piutang.map(p => `
+                    <div class="widget-box" style="margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-weight:600;font-size:15px;color:#0f172a;">${p.nama}</div>
+                                <div style="font-size:12px;color:#64748b;margin-top:2px;"><i class="far fa-calendar-alt" style="margin-right:4px;"></i>Jatuh tempo: ${new Date(p.jatuhTempo).toLocaleDateString('id-ID')}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:700;font-size:17px;color:#0f172a;">${formatRupiah(p.nominal)}</div>
+                                <span class="tag-status ${p.lunas ? 'tag-lunas' : 'tag-bayar'}" style="${!p.lunas ? 'font-size:10px;padding:2px 8px;' : ''}">${p.lunas ? 'Lunas' : 'Belum'}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;display:flex;gap:6px;flex-wrap:wrap;">
+                            ${!p.lunas ? `<button onclick="terimaPiutang('${p.id}')" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Terima</button>` : `<button onclick="unbayarPiutang('${p.id}')" class="btn btn-warning btn-sm"><i class="fas fa-undo"></i> Batal Lunas</button>`}
+                            <button onclick="editPiutang('${p.id}')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+                            <button onclick="hapusPiutang('${p.id}')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        let invoiceFilter = 'all';
+        let invoicePage = 1;
+        const invoicePerPage = 15;
+
+        function renderInvoice() {
+            renderInvoiceStats();
+            renderInvoiceTable();
+            renderInvoicePagination();
+        }
+
+        function renderInvoiceStats() {
+            const totalInv = appData.invoice.length;
+            const totalSales = appData.invoice.reduce((s, i) => s + hitungTotalInvoice(i.items), 0);
+            const totalPaid = appData.invoice.filter(i => i.status === 'paid').reduce((s, i) => s + hitungTotalInvoice(i.items), 0);
+            const totalUnpaid = appData.invoice.filter(i => i.status === 'unpaid').reduce((s, i) => s + hitungTotalInvoice(i.items), 0);
+
+            document.getElementById('invStatsGrid').innerHTML = `
+                <div class="inv-stat">
+                    <div class="label">Total Invoice</div>
+                    <div class="value">${totalInv}</div>
+                </div>
+                <div class="inv-stat">
+                    <div class="label">Total Penjualan</div>
+                    <div class="value indigo">${formatRupiah(totalSales)}</div>
+                </div>
+                <div class="inv-stat">
+                    <div class="label">Sudah Dibayar</div>
+                    <div class="value green">${formatRupiah(totalPaid)}</div>
+                </div>
+                <div class="inv-stat">
+                    <div class="label">Belum Dibayar</div>
+                    <div class="value red">${formatRupiah(totalUnpaid)}</div>
+                </div>
+            `;
+        }
+
+        function filterInvoice(filter) {
+            invoiceFilter = filter;
+            invoicePage = 1;
+            document.querySelectorAll('.inv-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.inv-tab[data-filter="${filter}"]`).classList.add('active');
+            renderInvoiceTable();
+            renderInvoicePagination();
+        }
+
+        function getFilteredInvoices() {
+            const search = (document.getElementById('invSearchInput').value || '').toLowerCase().trim();
+            let data = appData.invoice;
+            if (invoiceFilter === 'paid') data = data.filter(i => i.status === 'paid');
+            else if (invoiceFilter === 'unpaid') data = data.filter(i => i.status === 'unpaid');
+            if (search) {
+                data = data.filter(i =>
+                    i.customer.toLowerCase().includes(search) ||
+                    i.nomor.toLowerCase().includes(search)
+                );
+            }
+            return data;
+        }
+
+        function renderInvoiceTable() {
+            const data = getFilteredInvoices();
+            const start = (invoicePage - 1) * invoicePerPage;
+            const pageData = data.slice(start, start + invoicePerPage);
+            const tbody = document.getElementById('invoiceTableBody');
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:30px;">Tidak ada invoice</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(inv => {
+                const total = hitungTotalInvoice(inv.items);
+                const isPaid = inv.status === 'paid';
+                const firstItem = inv.items[0];
+                const produkText = firstItem ? `${firstItem.nama}${inv.items.length > 1 ? ` (+${inv.items.length - 1} item)` : ''}` : '-';
+
+                return `
+                    <tr class="inv-row" onclick="showInvoiceDetail('${inv.id}')">
+                        <td><span class="inv-kode">${inv.nomor}</span></td>
+                        <td class="inv-tgl">${inv.tanggal ? new Date(inv.tanggal).toLocaleDateString('id-ID') : '-'}</td>
+                        <td>
+                            <div class="inv-plg">${inv.customer}</div>
+                        </td>
+                        <td><span class="inv-produk">${produkText}</span></td>
+                        <td class="inv-total">${formatRupiah(total)}</td>
+                        <td class="inv-status">
+                            <span class="tag-status ${isPaid ? 'tag-lunas' : 'tag-bayar'}" style="${!isPaid ? 'font-size:10px;padding:2px 8px;' : ''}">${isPaid ? 'Lunas' : 'Belum'}</span>
+                        </td>
+                        <td class="inv-aksi" onclick="event.stopPropagation()">
+                            ${isPaid ? `<button onclick="unpaidInvoice('${inv.id}')" title="Batal Lunas" style="color:#f59e0b;"><i class="fas fa-undo"></i></button>` : `<button onclick="bayarInvoice('${inv.id}')" title="Bayar" style="color:#10b981;"><i class="fas fa-credit-card"></i></button>`}
+                            <button onclick="downloadInvoicePDF('${inv.id}')" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
+                            <button onclick="shareInvoice('${inv.id}')" title="Share"><i class="fas fa-share-alt"></i></button>
+                            <button onclick="editInvoice('${inv.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderInvoicePagination() {
+            const data = getFilteredInvoices();
+            const totalPages = Math.ceil(data.length / invoicePerPage) || 1;
+            const container = document.getElementById('invPagination');
+
+            container.innerHTML = `
+                <div class="info">Total ${data.length} data</div>
+                <div class="pages">
+                    ${Array.from({ length: totalPages }, (_, i) => i + 1).map(p =>
+                        `<span class="${p === invoicePage ? 'active' : ''}" onclick="goInvoicePage(${p})">${p}</span>`
+                    ).join('')}
+                    <span style="color:#94a3b8;font-size:12px;margin-left:4px;">${invoicePerPage} / page</span>
+                </div>
+            `;
+        }
+
+        function goInvoicePage(p) {
+            invoicePage = p;
+            renderInvoiceTable();
+            renderInvoicePagination();
+        }
+
+        function exportInvoiceExcel() {
+            const data = getFilteredInvoices().map(inv => {
+                const total = hitungTotalInvoice(inv.items);
+                return {
+                    'Kode': inv.nomor,
+                    'Tanggal': inv.tanggal ? new Date(inv.tanggal).toLocaleDateString('id-ID') : '-',
+                    'Pelanggan': inv.customer,
+                    'Produk': inv.items.map(i => i.nama).join(', '),
+                    'Total': total,
+                    'Status': inv.status === 'paid' ? 'Lunas' : 'Belum Dibayar'
+                };
+            });
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Invoice');
+            XLSX.writeFile(wb, 'data-invoice-sabinta.xlsx');
+        }
+
+        // =============================================
+        // INVOICE DETAIL / PREVIEW
+        // =============================================
+        let currentInvoiceId = null;
+
+        function showInvoiceDetail(id) {
+            currentInvoiceId = id;
+            document.querySelectorAll('.hidden-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-dashboard').style.display = 'none';
+            document.getElementById('page-invoice-detail').classList.add('active');
+            document.getElementById('pageTitle').textContent = 'Detail Invoice';
+            renderInvoiceDetail(id);
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function goBackToInvoiceList() {
+            currentInvoiceId = null;
+            document.querySelectorAll('.hidden-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-dashboard').style.display = 'none';
+            document.getElementById('page-invoice').classList.add('active');
+            document.getElementById('pageTitle').textContent = 'Invoice';
+            renderInvoice();
+        }
+
+        function renderInvoiceDetail(id) {
+            const inv = appData.invoice.find(i => i.id === id);
+            if (!inv) {
+                document.getElementById('invoiceDetailContent').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px;">Invoice tidak ditemukan</div>';
+                return;
+            }
+            const total = hitungTotalInvoice(inv.items);
+            const isPaid = inv.status === 'paid';
+            const paymentAcc = inv.paymentAccountId ? appData.bukuKas.find(b => b.id === inv.paymentAccountId) : null;
+
+            let itemsHtml = inv.items.map((item, idx) => {
+                const subtotal = (item.qty * item.harga) - item.diskon;
+                return `
+                    <tr>
+                        <td style="width:32px;text-align:center;color:#94a3b8;">${idx + 1}</td>
+                        <td>${item.nama}</td>
+                        <td style="text-align:center;">${item.qty}</td>
+                        <td style="text-align:center;font-size:11px;color:#64748b;">${item.satuan || '-'}</td>
+                        <td style="text-align:right;">${formatRupiah(item.harga)}</td>
+                        <td style="text-align:right;">${item.diskon > 0 ? formatRupiah(item.diskon) : '-'}</td>
+                        <td style="text-align:right;font-weight:700;">${formatRupiah(subtotal)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('invoiceDetailContent').innerHTML = `
+                <div class="invoice-preview" id="invoicePreviewContent">
+                    <div class="inv-preview-header">
+                        <div class="brand">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA" style="height:32px;border-radius:6px;">
+                                <div>
+                                    <div style="font-size:20px;font-weight:800;color:#0f172a;">SABINTA</div>
+                                    <small style="font-size:10px;color:#94a3b8;">THE RIGHT SOLUTION FOR YOUR NEEDS</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="status-badge ${isPaid ? 'paid' : 'unpaid'}">
+                            ${isPaid ? 'LUNAS' : 'BELUM DIBAYAR'}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <div style="font-size:14px;color:#475569;">Kode Invoice: <strong style="color:#6366f1;white-space:nowrap;">${inv.nomor}</strong></div>
+                        <div style="font-size:13px;color:#475569;">Tgl. Order: <strong>${inv.tanggal ? new Date(inv.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</strong></div>
+                    </div>
+
+                    <div class="inv-preview-meta">
+                        <div class="meta-group">
+                            <label>Kepada</label>
+                            <div class="value">${inv.customer}</div>
+                        </div>
+                        <div class="meta-group" style="text-align:right;">
+                            <label>Pembayaran Via</label>
+                            <div class="value">${inv.metode || (paymentAcc ? paymentAcc.nama : '-')}</div>
+                            ${paymentAcc && paymentAcc.norek && paymentAcc.norek !== '-' && paymentAcc.id !== 'cash' ? `<div style="font-size:11px;color:#94a3b8;margin-top:2px;">${paymentAcc.norek}</div>` : ''}
+                        </div>
+                    </div>
+
+                    <table class="inv-preview-table">
+                        <thead>
+                            <tr>
+                                <th style="width:32px;text-align:center;">#</th>
+                                <th>Produk / Jasa</th>
+                                <th style="text-align:center;">Qty</th>
+                                <th style="text-align:center;">Satuan</th>
+                                <th style="text-align:right;">Harga</th>
+                                <th style="text-align:right;">Diskon</th>
+                                <th style="text-align:right;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+
+                    <div style="display:flex;gap:24px;margin-top:8px;">
+                        <div style="flex:1;min-width:0;">
+                            ${isPaid ? `
+                            <div style="padding:14px;background:#f8fafc;border:1px solid rgba(99,102,241,0.08);border-radius:10px;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(inv.nomor)}" alt="QR" style="width:90px;height:90px;display:block;margin-bottom:6px;border-radius:6px;">
+                                <div style="font-size:14px;font-weight:700;color:#6366f1;letter-spacing:1px;">SABINTA</div>
+                                <div style="font-size:8px;color:#94a3b8;margin-top:2px;">DIGITALLY SIGNED &amp; VERIFIED</div>
+                            </div>
+                            ` : `
+                            <div style="padding:10px 12px;background:#f8fafc;border:1px solid rgba(99,102,241,0.06);border-radius:8px;">
+                                <div style="font-size:11px;font-weight:700;color:#0f172a;margin-bottom:6px;">Pembayaran Via:</div>
+                                <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+                                    <span style="font-size:11px;color:#475569;">Bank BRI Account: <strong>683301012398536</strong></span>
+                                    <i class="fas fa-copy" onclick="copyText('683301012398536', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin nomor rekening"></i>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+                                    <span style="font-size:11px;color:#475569;">Shopeepay: <strong>083826271995</strong></span>
+                                    <i class="fas fa-copy" onclick="copyText('083826271995', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin nomor Shopeepay"></i>
+                                </div>
+                                <div style="font-size:10px;color:#94a3b8;">a.n FITRIANTO</div>
+                            </div>
+                            `}
+                        </div>
+                        <div style="flex-shrink:0;">
+                            <div class="inv-preview-total" style="margin-left:0;">
+                                <div class="total-row">
+                                    <span>Subtotal</span>
+                                    <span>${formatRupiah(total)}</span>
+                                </div>
+                                <div class="total-row" style="color:#94a3b8;font-size:12px;">
+                                    <span>Pajak (0%)</span>
+                                    <span>Rp0</span>
+                                </div>
+                                <div class="total-row grand">
+                                    <span>Grand Total</span>
+                                    <span>${formatRupiah(total)}</span>
+                                </div>
+                            </div>
+                            ${isPaid ? `
+                            <div style="margin-top:8px;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;align-items:center;gap:6px;">
+                                <span style="font-size:13px;">✅</span>
+                                <span style="font-size:10px;font-weight:600;color:#16a34a;">Invoice ini sudah LUNAS. Terima kasih.</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div class="inv-preview-notes ${inv.catatan ? 'show' : ''}">
+                        <strong><i class="fas fa-sticky-note"></i> Catatan</strong>
+                        ${inv.catatan || ''}
+                    </div>
+
+                    <div class="inv-preview-footer">
+                        THE RIGHT SOLUTION FOR YOUR NEEDS &middot; SABINTA
+                    </div>
+                </div>
+            `;
+        }
+
+        // =============================================
+        // LAPORAN
+
+        function renderLaporan() {
+            const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk').reduce((s, t) => s + t.nominal, 0);
+            const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar').reduce((s, t) => s + t.nominal, 0);
+            const saldoAkhir = hitungTotalSaldo();
+
+            document.getElementById('totalPemasukan').textContent = formatRupiah(totalPemasukan);
+            document.getElementById('totalPengeluaran').textContent = formatRupiah(totalPengeluaran);
+            document.getElementById('saldoAkhirLaporan').textContent = formatRupiah(saldoAkhir);
+            document.getElementById('totalTransaksiLaporan').textContent = appData.transaksi.length;
+
+            const sorted = [...appData.transaksi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            const tbody = document.getElementById('laporanTableBody');
+            if (sorted.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px;">Belum ada transaksi</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = sorted.map(t => {
+                const isIncome = t.tipe === 'masuk';
+                return `
+                    <tr>
+                        <td>${new Date(t.tanggal).toLocaleString('id-ID')}</td>
+                        <td>${getBukuName(t.bukuId)}</td>
+                        <td>${t.kategori}</td>
+                        <td class="${isIncome ? 'text-green' : 'text-red'}">
+                            ${isIncome ? '+' : '-'} ${formatRupiah(t.nominal)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // =============================================
+        // EXPORT FUNCTIONS
+        // =============================================
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const sorted = [...appData.transaksi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            
+            doc.text('SABINTA - Laporan Keuangan', 14, 20);
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text('THE RIGHT SOLUTION FOR YOUR NEEDS', 14, 27);
+            doc.text('Tanggal: ' + new Date().toLocaleDateString('id-ID'), 14, 30);
+            
+            const data = sorted.map(t => [
+                new Date(t.tanggal).toLocaleString('id-ID'),
+                getBukuName(t.bukuId),
+                t.kategori,
+                (t.tipe === 'masuk' ? '+' : '-') + formatRupiah(t.nominal)
+            ]);
+            
+            doc.autoTable({
+                head: [['Tanggal', 'Buku Kas', 'Kategori', 'Nominal']],
+                body: data,
+                startY: 40
+            });
+            
+            doc.save('laporan-keuangan-sabinta.pdf');
+        }
+
+        function exportExcel() {
+            const sorted = [...appData.transaksi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            const data = sorted.map(t => ({
+                Tanggal: new Date(t.tanggal).toLocaleString('id-ID'),
+                'Buku Kas': getBukuName(t.bukuId),
+                Kategori: t.kategori,
+                Nominal: (t.tipe === 'masuk' ? '+' : '-') + formatRupiah(t.nominal)
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
+            XLSX.writeFile(wb, 'laporan-keuangan-sabinta.xlsx');
+        }
+
+        // =============================================
+        // NAVIGASI
+        // =============================================
+        function showPage(pageId) {
+            document.querySelectorAll('.hidden-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-dashboard').style.display = 'none';
+
+            if (pageId === 'dashboard') {
+                document.getElementById('page-dashboard').style.display = 'block';
+                document.getElementById('pageTitle').textContent = 'Dashboard';
+                renderDashboard();
+                if (window.innerWidth <= 768) toggleSidebar();
+            } else if (pageId === 'buku-kas') {
+                document.getElementById('page-buku-kas').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Buku Kas';
+                renderBukuKasList();
+                renderRincianPerRekening();
+                if (window.innerWidth <= 768) toggleSidebar();
+            } else if (pageId === 'invoice') {
+                document.getElementById('page-invoice').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Invoice';
+                renderInvoice();
+                if (window.innerWidth <= 768) toggleSidebar();
+            } else if (pageId === 'utang') {
+                document.getElementById('page-utang').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Utang';
+                renderUtang();
+                if (window.innerWidth <= 768) toggleSidebar();
+            } else if (pageId === 'piutang') {
+                document.getElementById('page-piutang').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Piutang';
+                renderPiutang();
+                if (window.innerWidth <= 768) toggleSidebar();
+            } else if (pageId === 'laporan') {
+                document.getElementById('page-laporan').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Laporan';
+                renderLaporan();
+                if (window.innerWidth <= 768) toggleSidebar();
+            }
+
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.menu-item').classList.add('active');
+        }
+
+        // =============================================
+        // MODAL SYSTEM
+        // =============================================
+        let modalMode = '';
+        let editId = null;
+
+        function openModal(mode, id = null) {
+            modalMode = mode;
+            editId = id;
+            const modal = document.getElementById('modalTransaksi');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            const saveBtn = document.getElementById('modalSaveBtn');
+
+            if (mode === 'buku') {
+                title.textContent = editId ? '✏️ Edit Buku Kas' : '➕ Tambah Buku Kas';
+                const data = editId ? appData.bukuKas.find(b => b.id === editId) : null;
+                body.innerHTML = `
+                    <label>Nama Buku Kas</label>
+                    <input type="text" id="f_nama_buku" value="${data ? data.nama : ''}" placeholder="Contoh: Bank Mandiri">
+                    <label>Saldo Awal (Rp)</label>
+                    <input type="number" id="f_saldo_buku" value="${data ? data.saldo : 0}" placeholder="0">
+                    <label>No Rekening (Opsional)</label>
+                    <input type="text" id="f_norek" value="${data ? data.norek : ''}" placeholder="Contoh: 1234-5678-9012-3456">
+                `;
+                saveBtn.style.display = 'block';
+            } else if (mode === 'transaksi') {
+                title.textContent = editId ? '✏️ Edit Transaksi' : '➕ Tambah Transaksi';
+                const data = editId ? appData.transaksi.find(t => t.id === editId) : null;
+                body.innerHTML = `
+                    <label>Tanggal</label>
+                    <input type="datetime-local" id="f_tanggal" value="${data ? data.tanggal : new Date().toISOString().slice(0,16)}">
+                    <label>Buku Kas</label>
+                    <select id="f_buku">
+                        ${appData.bukuKas.map(b => `<option value="${b.id}" ${data && data.bukuId === b.id ? 'selected' : ''}>${b.nama}</option>`).join('')}
+                    </select>
+                    <label>Tipe</label>
+                    <select id="f_tipe">
+                        <option value="masuk" ${data && data.tipe === 'masuk' ? 'selected' : ''}>💰 Pemasukan</option>
+                        <option value="keluar" ${data && data.tipe === 'keluar' ? 'selected' : ''}>💸 Pengeluaran</option>
+                    </select>
+                    <label>Nominal (Rp)</label>
+                    <input type="number" id="f_nominal" value="${data ? data.nominal : ''}" placeholder="100000">
+                    <label>Kategori / Deskripsi</label>
+                    <input type="text" id="f_desc" value="${data ? data.desc || data.kategori : ''}" placeholder="Makan, Gaji, dll">
+                `;
+                if (editId) {
+                    body.innerHTML += `
+                        <div style="margin-top:10px; text-align:center;">
+                            <button type="button" class="btn btn-danger" onclick="hapusTransaksi('${editId}')" style="width:100%;">Hapus Transaksi</button>
+                        </div>
+                    `;
+                }
+                saveBtn.style.display = 'block';
+            } else if (mode === 'utang') {
+                title.textContent = editId ? '✏️ Edit Utang' : '📝 Tambah Utang';
+                const data = editId ? appData.utang.find(u => u.id === editId) : null;
+                body.innerHTML = `
+                    <label>Nama Kreditor</label>
+                    <input type="text" id="f_nama" value="${data ? data.nama : ''}" placeholder="Nama orang/company">
+                    <label>Nominal Utang (Rp)</label>
+                    <input type="number" id="f_nominal" value="${data ? data.nominal : ''}" placeholder="500000">
+                    <label>Jatuh Tempo</label>
+                    <input type="date" id="f_jatuhTempo" value="${data ? data.jatuhTempo : ''}">
+                `;
+                saveBtn.style.display = 'block';
+            } else if (mode === 'piutang') {
+                title.textContent = editId ? '✏️ Edit Piutang' : '📝 Tambah Piutang';
+                const data = editId ? appData.piutang.find(p => p.id === editId) : null;
+                body.innerHTML = `
+                    <label>Nama Debitur</label>
+                    <input type="text" id="f_nama" value="${data ? data.nama : ''}" placeholder="Nama customer">
+                    <label>Nominal Piutang (Rp)</label>
+                    <input type="number" id="f_nominal" value="${data ? data.nominal : ''}" placeholder="750000">
+                    <label>Jatuh Tempo</label>
+                    <input type="date" id="f_jatuhTempo" value="${data ? data.jatuhTempo : ''}">
+                `;
+                saveBtn.style.display = 'block';
+            } else if (mode === 'invoice') {
+                const data = editId ? appData.invoice.find(inv => inv.id === editId) : null;
+                title.textContent = editId ? '✏️ Edit Invoice' : '📝 Buat Invoice Baru';
+                const itemsHtml = (data && data.items ? data.items : [{ nama: '', qty: 1, harga: 0, diskon: 0 }]).map((item, idx) => `
+                    <div class="invoice-item-card" data-index="${idx}">
+                        <div class="invoice-item-header">
+                            <span>Item #${idx + 1}</span>
+                            <button type="button" onclick="removeInvoiceItem(this)" class="btn btn-danger btn-sm" ${idx === 0 && (!data || data.items.length === 1) ? 'style="display:none;"' : ''}><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="invoice-row">
+                            <div class="full">
+                                <label>Nama Produk / Jasa</label>
+                                <input type="text" class="f_item_nama" value="${item.nama || ''}" placeholder="Nama produk / jasa...">
+                            </div>
+                            <div>
+                                <label>Jumlah</label>
+                                <input type="number" class="f_item_qty" value="${item.qty || 1}" min="1">
+                            </div>
+                            <div>
+                                <label>Satuan</label>
+                                <select class="f_item_satuan">
+                                    <option value="">pilih</option>
+                                    <option value="pcs" ${item.satuan === 'pcs' ? 'selected' : ''}>pcs</option>
+                                    <option value="lembar" ${item.satuan === 'lembar' ? 'selected' : ''}>lembar</option>
+                                    <option value="meter" ${item.satuan === 'meter' ? 'selected' : ''}>meter</option>
+                                    <option value="kg" ${item.satuan === 'kg' ? 'selected' : ''}>kg</option>
+                                    <option value="liter" ${item.satuan === 'liter' ? 'selected' : ''}>liter</option>
+                                    <option value="box" ${item.satuan === 'box' ? 'selected' : ''}>box</option>
+                                    <option value="pack" ${item.satuan === 'pack' ? 'selected' : ''}>pack</option>
+                                    <option value="unit" ${item.satuan === 'unit' ? 'selected' : ''}>unit</option>
+                                    <option value="set" ${item.satuan === 'set' ? 'selected' : ''}>set</option>
+                                    <option value="buah" ${item.satuan === 'buah' ? 'selected' : ''}>buah</option>
+                                    <option value="ekor" ${item.satuan === 'ekor' ? 'selected' : ''}>ekor</option>
+                                    <option value="kali" ${item.satuan === 'kali' ? 'selected' : ''}>kali</option>
+                                    <option value="project" ${item.satuan === 'project' ? 'selected' : ''}>project</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Harga @</label>
+                                <input type="number" class="f_item_harga" value="${item.harga || 0}" placeholder="0">
+                            </div>
+                            <div>
+                                <label>Diskon</label>
+                                <input type="number" class="f_item_diskon" value="${item.diskon || 0}" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                body.innerHTML = `
+                    <div class="invoice-form-card">
+                        <div>
+                            <label><i class="fas fa-user"></i> Nama Pelanggan</label>
+                            <input type="text" id="f_customer" value="${data ? data.customer : ''}" placeholder="Ketik atau pilih pelanggan...">
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                            <div>
+                                <label><i class="far fa-calendar"></i> Tgl. Order</label>
+                                <input type="date" id="f_tanggal" value="${data ? data.tanggal || new Date().toISOString().slice(0,10) : new Date().toISOString().slice(0,10)}">
+                            </div>
+                            <div>
+                                <label><i class="far fa-clock"></i> Jatuh Tempo</label>
+                                <input type="date" id="f_jatuhTempo" value="${data ? data.jatuhTempo : ''}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin:14px 0;">
+                        <div style="font-weight:600; font-size:13px; color:#475569; margin-bottom:6px;">DETAIL PESANAN</div>
+                        <div id="invoiceItemsContainer">
+                            ${itemsHtml}
+                        </div>
+                        <button type="button" onclick="addInvoiceItem()" style="width:100%;padding:14px;border:2px dashed rgba(99,102,241,0.3);border-radius:12px;background:rgba(99,102,241,0.04);color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;" onmouseover="this.style.borderColor='#6366f1';this.style.background='rgba(99,102,241,0.08)';" onmouseout="this.style.borderColor='rgba(99,102,241,0.3)';this.style.background='rgba(99,102,241,0.04)';"><i class="fas fa-plus-circle"></i> Tambah Item</button>
+                        <div class="invoice-grand-total" id="invoiceGrandTotal">
+                            <span class="label">GRAND TOTAL</span>
+                            <span class="value">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label><i class="fas fa-university"></i> Rekening Pembayaran (opsional)</label>
+                        <select id="f_paymentAccount">
+                            <option value="">Pilih rekening...</option>
+                            ${appData.bukuKas.map(b => `<option value="${b.id}" ${data && data.paymentAccountId === b.id ? 'selected' : ''}>${b.nama} ${b.norek && b.norek !== '-' ? '- ' + b.norek : ''}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="far fa-file-alt"></i> Catatan (opsional)</label>
+                        <input type="text" id="f_catatan" value="${data ? data.catatan : ''}" placeholder="Catatan internal...">
+                    </div>
+                `;
+                saveBtn.style.display = 'block';
+                setTimeout(() => {
+                    document.querySelectorAll('.f_item_qty, .f_item_harga, .f_item_diskon').forEach(el => {
+                        el.addEventListener('input', updateInvoiceTotal);
+                    });
+                    updateInvoiceTotal();
+                }, 100);
+            }
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modalTransaksi').classList.remove('open');
+            editId = null;
+        }
+
+        function addInvoiceItem() {
+            const container = document.getElementById('invoiceItemsContainer');
+            const idx = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'invoice-item-card';
+            div.dataset.index = idx;
+            div.innerHTML = `
+                <div class="invoice-item-header">
+                    <span>Item #${idx + 1}</span>
+                    <button type="button" onclick="removeInvoiceItem(this)" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                </div>
+                <div class="invoice-row">
+                    <div class="full">
+                        <label>Nama Produk / Jasa</label>
+                        <input type="text" class="f_item_nama" placeholder="Nama produk / jasa...">
+                    </div>
+                    <div>
+                        <label>Jumlah</label>
+                        <input type="number" class="f_item_qty" value="1" min="1">
+                    </div>
+                    <div>
+                        <label>Satuan</label>
+                        <select class="f_item_satuan">
+                            <option value="">pilih</option>
+                            <option value="pcs">pcs</option>
+                            <option value="lembar">lembar</option>
+                            <option value="meter">meter</option>
+                            <option value="kg">kg</option>
+                            <option value="liter">liter</option>
+                            <option value="box">box</option>
+                            <option value="pack">pack</option>
+                            <option value="unit">unit</option>
+                            <option value="set">set</option>
+                            <option value="buah">buah</option>
+                            <option value="ekor">ekor</option>
+                            <option value="kali">kali</option>
+                            <option value="project">project</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Harga @</label>
+                        <input type="number" class="f_item_harga" value="0" placeholder="0">
+                    </div>
+                    <div>
+                        <label>Diskon</label>
+                        <input type="number" class="f_item_diskon" value="0" placeholder="0">
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            div.querySelectorAll('.f_item_qty, .f_item_harga, .f_item_diskon').forEach(el => {
+                el.addEventListener('input', updateInvoiceTotal);
+            });
+            updateInvoiceTotal();
+        }
+
+        function removeInvoiceItem(btn) {
+            const card = btn.closest('.invoice-item-card');
+            if (document.getElementById('invoiceItemsContainer').children.length > 1) {
+                card.remove();
+                updateInvoiceTotal();
+            }
+        }
+
+        function updateInvoiceTotal() {
+            const items = document.querySelectorAll('.invoice-item-card');
+            let total = 0;
+            items.forEach(item => {
+                const qty = parseInt(item.querySelector('.f_item_qty').value) || 0;
+                const harga = parseInt(item.querySelector('.f_item_harga').value) || 0;
+                const diskon = parseInt(item.querySelector('.f_item_diskon').value) || 0;
+                total += (qty * harga) - diskon;
+            });
+            document.querySelector('#invoiceGrandTotal .value').textContent = formatRupiah(total);
+        }
+
+        // =============================================
+        // SAVE MODAL
+        // =============================================
+        function saveModal() {
+            if (modalMode === 'buku') {
+                const nama = document.getElementById('f_nama_buku').value.trim();
+                const saldo = parseInt(document.getElementById('f_saldo_buku').value) || 0;
+                const norek = document.getElementById('f_norek').value.trim() || '-';
+                if (!nama) { alert('Nama buku kas wajib diisi!'); return; }
+                if (editId) {
+                    const buku = appData.bukuKas.find(b => b.id === editId);
+                    if (buku) {
+                        buku.nama = nama;
+                        buku.saldo = saldo;
+                        buku.norek = norek;
+                    }
+                } else {
+                    appData.bukuKas.push({
+                        id: 'bk' + generateId(),
+                        nama: nama,
+                        icon: 'fa-university',
+                        saldo: saldo,
+                        norek: norek
+                    });
+                }
+                saveData();
+                closeModal();
+                refreshCurrentPage();
+            } else if (modalMode === 'transaksi') {
+                const tanggal = document.getElementById('f_tanggal').value;
+                const bukuId = document.getElementById('f_buku').value;
+                const tipe = document.getElementById('f_tipe').value;
+                const nominal = parseInt(document.getElementById('f_nominal').value);
+                const desc = document.getElementById('f_desc').value || 'Tanpa keterangan';
+
+                if (!tanggal || !nominal || nominal <= 0) { alert('Isi dengan benar!'); return; }
+
+                if (editId) {
+                    const oldTrans = appData.transaksi.find(t => t.id === editId);
+                    if (oldTrans) {
+                        const oldBuku = appData.bukuKas.find(b => b.id === oldTrans.bukuId);
+                        if (oldBuku) {
+                            if (oldTrans.tipe === 'masuk') oldBuku.saldo -= oldTrans.nominal;
+                            else oldBuku.saldo += oldTrans.nominal;
+                        }
+                        oldTrans.tanggal = tanggal;
+                        oldTrans.bukuId = bukuId;
+                        oldTrans.tipe = tipe;
+                        oldTrans.nominal = nominal;
+                        oldTrans.desc = desc;
+                        oldTrans.kategori = desc;
+                        const newBuku = appData.bukuKas.find(b => b.id === bukuId);
+                        if (newBuku) {
+                            if (tipe === 'masuk') newBuku.saldo += nominal;
+                            else newBuku.saldo -= nominal;
+                        }
+                    }
+                } else {
+                    const buku = appData.bukuKas.find(b => b.id === bukuId);
+                    if (tipe === 'masuk') buku.saldo += nominal;
+                    else buku.saldo -= nominal;
+
+                    appData.transaksi.push({
+                        id: 't' + generateId(),
+                        tanggal: tanggal,
+                        bukuId: bukuId,
+                        tipe: tipe,
+                        nominal: nominal,
+                        kategori: desc,
+                        desc: desc
+                    });
+                }
+                saveData();
+                closeModal();
+                refreshCurrentPage();
+            } else if (modalMode === 'utang') {
+                const nama = document.getElementById('f_nama').value.trim();
+                const nominal = parseInt(document.getElementById('f_nominal').value);
+                const jatuhTempo = document.getElementById('f_jatuhTempo').value;
+                if (!nama || !nominal || !jatuhTempo) { alert('Lengkapi data!'); return; }
+                if (editId) {
+                    const utang = appData.utang.find(u => u.id === editId);
+                    if (utang) {
+                        utang.nama = nama;
+                        utang.nominal = nominal;
+                        utang.jatuhTempo = jatuhTempo;
+                    }
+                } else {
+                    appData.utang.push({
+                        id: 'u' + generateId(),
+                        nama: nama,
+                        nominal: nominal,
+                        jatuhTempo: jatuhTempo,
+                        lunas: false
+                    });
+                }
+                saveData();
+                closeModal();
+                refreshCurrentPage();
+            } else if (modalMode === 'piutang') {
+                const nama = document.getElementById('f_nama').value.trim();
+                const nominal = parseInt(document.getElementById('f_nominal').value);
+                const jatuhTempo = document.getElementById('f_jatuhTempo').value;
+                if (!nama || !nominal || !jatuhTempo) { alert('Lengkapi data!'); return; }
+                if (editId) {
+                    const piutang = appData.piutang.find(p => p.id === editId);
+                    if (piutang) {
+                        piutang.nama = nama;
+                        piutang.nominal = nominal;
+                        piutang.jatuhTempo = jatuhTempo;
+                    }
+                } else {
+                    appData.piutang.push({
+                        id: 'p' + generateId(),
+                        nama: nama,
+                        nominal: nominal,
+                        jatuhTempo: jatuhTempo,
+                        lunas: false
+                    });
+                }
+                saveData();
+                closeModal();
+                refreshCurrentPage();
+            } else if (modalMode === 'invoice') {
+                const customer = document.getElementById('f_customer').value.trim();
+                const tanggal = document.getElementById('f_tanggal').value;
+                const jatuhTempo = document.getElementById('f_jatuhTempo').value;
+                const paymentAccountId = document.getElementById('f_paymentAccount').value;
+                const catatan = document.getElementById('f_catatan').value.trim();
+                const itemCards = document.querySelectorAll('.invoice-item-card');
+                const items = [];
+                itemCards.forEach(card => {
+                    const nama = card.querySelector('.f_item_nama').value.trim();
+                    const qty = parseInt(card.querySelector('.f_item_qty').value) || 0;
+                    const satuan = card.querySelector('.f_item_satuan').value.trim();
+                    const harga = parseInt(card.querySelector('.f_item_harga').value) || 0;
+                    const diskon = parseInt(card.querySelector('.f_item_diskon').value) || 0;
+                    if (nama && qty > 0) {
+                        items.push({ nama, qty, satuan, harga, diskon });
+                    }
+                });
+                if (!customer || items.length === 0) { alert('Lengkapi data pelanggan dan minimal 1 item!'); return; }
+                if (editId) {
+                    const inv = appData.invoice.find(i => i.id === editId);
+                    if (inv) {
+                        inv.customer = customer;
+                        inv.tanggal = tanggal;
+                        inv.jatuhTempo = jatuhTempo;
+                        inv.items = items;
+                        inv.paymentAccountId = paymentAccountId;
+                        inv.catatan = catatan;
+                    }
+                } else {
+                    const nomor = 'INV-' + new Date().getFullYear() + '-' + String(appData.invoice.length + 1).padStart(3, '0');
+                    appData.invoice.push({
+                        id: 'inv' + generateId(),
+                        nomor: nomor,
+                        customer: customer,
+                        items: items,
+                        tanggal: tanggal,
+                        jatuhTempo: jatuhTempo,
+                        paymentAccountId: paymentAccountId,
+                        status: 'unpaid',
+                        metode: '',
+                        catatan: catatan
+                    });
+                }
+                saveData();
+                closeModal();
+                refreshCurrentPage();
+            }
+        }
+
+        // =============================================
+        // CRUD - BUKU KAS
+        // =============================================
+        function editBuku(id) {
+            openModal('buku', id);
+        }
+
+        function hapusBuku(id) {
+            if (!confirm('Hapus buku kas ini? Semua transaksi terkait akan dihapus.')) return;
+            appData.bukuKas = appData.bukuKas.filter(b => b.id !== id);
+            appData.transaksi = appData.transaksi.filter(t => t.bukuId !== id);
+            saveData();
+            refreshCurrentPage();
+        }
+
+        // =============================================
+        // CRUD - TRANSAKSI
+        // =============================================
+        function editTransaksi(id) {
+            openModal('transaksi', id);
+        }
+
+        function hapusTransaksi(id) {
+            if (!confirm('Hapus transaksi ini? Saldo buku kas akan dikembalikan.')) return;
+            const t = appData.transaksi.find(t => t.id === id);
+            if (t) {
+                const buku = appData.bukuKas.find(b => b.id === t.bukuId);
+                if (buku) {
+                    if (t.tipe === 'masuk') buku.saldo -= t.nominal;
+                    else buku.saldo += t.nominal;
+                }
+                appData.transaksi = appData.transaksi.filter(x => x.id !== id);
+                saveData();
+                refreshCurrentPage();
+            }
+        }
+
+        // =============================================
+        // CRUD - UTANG
+        // =============================================
+        function bayarUtang(id) {
+            const utang = appData.utang.find(u => u.id === id);
+            if (!utang || utang.lunas) return;
+            if (!confirm(`Bayar utang ${utang.nama} sebesar ${formatRupiah(utang.nominal)}? (Uang akan diambil dari buku kas: Cash)`)) return;
+            const buku = appData.bukuKas.find(b => b.id === 'cash');
+            if (buku.saldo < utang.nominal) {
+                alert('Saldo Cash tidak mencukupi!');
+                return;
+            }
+            buku.saldo -= utang.nominal;
+            utang.lunas = true;
+            appData.transaksi.push({
+                id: 't' + generateId(),
+                tanggal: new Date().toISOString(),
+                bukuId: 'cash',
+                tipe: 'keluar',
+                nominal: utang.nominal,
+                kategori: 'Bayar Utang',
+                desc: `Bayar utang ke ${utang.nama}`
+            });
+            saveData();
+            refreshCurrentPage();
+            alert('Utang berhasil dibayar!');
+        }
+
+        function unbayarUtang(id) {
+            const utang = appData.utang.find(u => u.id === id);
+            if (!utang || !utang.lunas) return;
+            if (!confirm(`Batalkan pembayaran utang ${utang.nama}? Saldo Cash akan dikembalikan.`)) return;
+            const buku = appData.bukuKas.find(b => b.id === 'cash');
+            buku.saldo += utang.nominal;
+            utang.lunas = false;
+            const lastPayment = appData.transaksi.filter(t => t.desc && t.desc.includes(utang.nama)).pop();
+            if (lastPayment) {
+                appData.transaksi = appData.transaksi.filter(t => t.id !== lastPayment.id);
+            }
+            saveData();
+            refreshCurrentPage();
+            alert('Status utang dikembalikan ke belum lunas!');
+        }
+
+        function editUtang(id) {
+            openModal('utang', id);
+        }
+
+        function hapusUtang(id) {
+            if (!confirm('Hapus utang ini?')) return;
+            appData.utang = appData.utang.filter(u => u.id !== id);
+            saveData();
+            refreshCurrentPage();
+        }
+
+        // =============================================
+        // CRUD - PIUTANG
+        // =============================================
+        function terimaPiutang(id) {
+            const piutang = appData.piutang.find(p => p.id === id);
+            if (!piutang || piutang.lunas) return;
+            if (!confirm(`Terima pembayaran piutang dari ${piutang.nama} sebesar ${formatRupiah(piutang.nominal)}? (Uang akan masuk ke buku kas: BRI)`)) return;
+            const buku = appData.bukuKas.find(b => b.id === 'bri');
+            buku.saldo += piutang.nominal;
+            piutang.lunas = true;
+            appData.transaksi.push({
+                id: 't' + generateId(),
+                tanggal: new Date().toISOString(),
+                bukuId: 'bri',
+                tipe: 'masuk',
+                nominal: piutang.nominal,
+                kategori: 'Terima Piutang',
+                desc: `Terima piutang dari ${piutang.nama}`
+            });
+            saveData();
+            refreshCurrentPage();
+            alert('Piutang berhasil diterima!');
+        }
+
+        function unbayarPiutang(id) {
+            const piutang = appData.piutang.find(p => p.id === id);
+            if (!piutang || !piutang.lunas) return;
+            if (!confirm(`Batalkan penerimaan piutang ${piutang.nama}? Saldo BRI akan dikurangi.`)) return;
+            const buku = appData.bukuKas.find(b => b.id === 'bri');
+            buku.saldo -= piutang.nominal;
+            piutang.lunas = false;
+            const lastPayment = appData.transaksi.filter(t => t.desc && t.desc.includes(piutang.nama)).pop();
+            if (lastPayment) {
+                appData.transaksi = appData.transaksi.filter(t => t.id !== lastPayment.id);
+            }
+            saveData();
+            refreshCurrentPage();
+            alert('Status piutang dikembalikan ke belum lunas!');
+        }
+
+        function editPiutang(id) {
+            openModal('piutang', id);
+        }
+
+        function hapusPiutang(id) {
+            if (!confirm('Hapus piutang ini?')) return;
+            appData.piutang = appData.piutang.filter(p => p.id !== id);
+            saveData();
+            refreshCurrentPage();
+        }
+
+        // =============================================
+        // PAYMENT MODAL
+        // =============================================
+        let paymentInvoiceId = null;
+        let selectedPaymentMethod = null;
+
+        const paymentMethods = [
+            { id: 'bri', nama: 'BRI', icon: 'fa-university', color: '#2563eb' },
+            { id: 'cash', nama: 'Cash', icon: 'fa-money-bill-wave', color: '#10b981' },
+            { id: 'shopeepay', nama: 'ShopeePay', icon: 'fa-mobile-alt', color: '#ee4d2d' },
+            { id: 'qris', nama: 'QRIS', icon: 'fa-qrcode', color: '#8b5cf6' }
+        ];
+
+        function openPaymentModal(id) {
+            paymentInvoiceId = id;
+            selectedPaymentMethod = null;
+            const inv = appData.invoice.find(i => i.id === id);
+            if (!inv) return;
+            const total = hitungTotalInvoice(inv.items);
+
+            document.getElementById('paymentModalTitle').textContent = 'Pembayaran Invoice';
+            document.getElementById('paymentModalBody').innerHTML = `
+                <div style="margin-bottom:16px;padding:14px;background:#f8fafc;border-radius:10px;">
+                    <div style="font-size:13px;color:#64748b;">Invoice</div>
+                    <div style="font-size:16px;font-weight:700;color:#0f172a;margin-top:2px;">${inv.nomor}</div>
+                    <div style="font-size:13px;color:#475569;margin-top:2px;">${inv.customer}</div>
+                    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
+                        <span style="font-size:12px;color:#64748b;">Total</span>
+                        <span style="float:right;font-size:20px;font-weight:700;color:#0f172a;">${formatRupiah(total)}</span>
+                    </div>
+                </div>
+                <label style="font-size:13px;font-weight:600;color:#475569;margin-bottom:10px;display:block;">Pilih Metode Pembayaran</label>
+                <div id="paymentMethodList" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    ${paymentMethods.map(m => `
+                        <div class="payment-method-item" data-id="${m.id}" onclick="selectPaymentMethod('${m.id}')" style="padding:14px;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;">
+                            <div style="font-size:28px;color:${m.color};margin-bottom:6px;"><i class="fas ${m.icon}"></i></div>
+                            <div style="font-size:13px;font-weight:600;color:#0f172a;">${m.nama}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('paymentSaveBtn').disabled = true;
+            document.getElementById('paymentSaveBtn').style.opacity = '0.5';
+            document.getElementById('modalPembayaran').classList.add('open');
+        }
+
+        function selectPaymentMethod(id) {
+            selectedPaymentMethod = id;
+            document.querySelectorAll('.payment-method-item').forEach(el => {
+                const isActive = el.dataset.id === id;
+                el.style.borderColor = isActive ? '#6366f1' : '#e2e8f0';
+                el.style.background = isActive ? 'rgba(99,102,241,0.06)' : 'white';
+                el.style.boxShadow = isActive ? '0 0 0 3px rgba(99,102,241,0.12)' : 'none';
+            });
+            document.getElementById('paymentSaveBtn').disabled = false;
+            document.getElementById('paymentSaveBtn').style.opacity = '1';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('modalPembayaran').classList.remove('open');
+            paymentInvoiceId = null;
+            selectedPaymentMethod = null;
+        }
+
+        function confirmPayment() {
+            if (!selectedPaymentMethod || !paymentInvoiceId) return;
+            const inv = appData.invoice.find(i => i.id === paymentInvoiceId);
+            if (!inv || inv.status === 'paid') return;
+            const method = paymentMethods.find(m => m.id === selectedPaymentMethod);
+            if (!method) return;
+            const total = hitungTotalInvoice(inv.items);
+            const buku = appData.bukuKas.find(b => b.id === method.id);
+            if (!buku) { alert('Rekening tidak ditemukan!'); return; }
+            buku.saldo += total;
+            inv.status = 'paid';
+            inv.metode = method.nama;
+            appData.transaksi.push({
+                id: 't' + generateId(),
+                tanggal: new Date().toISOString(),
+                bukuId: method.id,
+                tipe: 'masuk',
+                nominal: total,
+                kategori: 'Pembayaran Invoice',
+                desc: `Pembayaran invoice ${inv.nomor} dari ${inv.customer} via ${method.nama}`
+            });
+            saveData();
+            closePaymentModal();
+            refreshCurrentPage();
+        }
+
+        // =============================================
+        // CRUD - INVOICE
+        // =============================================
+        function editInvoice(id) {
+            openModal('invoice', id);
+        }
+
+        function hapusInvoice(id) {
+            if (!confirm('Hapus invoice ini?')) return;
+            appData.invoice = appData.invoice.filter(i => i.id !== id);
+            saveData();
+            refreshCurrentPage();
+        }
+
+        function bayarInvoice(id) { openPaymentModal(id); }
+
+        function unpaidInvoice(id) {
+            const inv = appData.invoice.find(i => i.id === id);
+            if (!inv || inv.status === 'unpaid') return;
+            if (!confirm(`Kembalikan invoice ${inv.nomor} ke status Unpaid?`)) return;
+            const total = hitungTotalInvoice(inv.items);
+            const buku = appData.bukuKas.find(b => b.id === inv.metode === 'BRI' ? 'bri' : 'cash');
+            if (buku) {
+                buku.saldo -= total;
+            }
+            inv.status = 'unpaid';
+            inv.metode = '';
+            const lastPayment = appData.transaksi.filter(t => t.desc && t.desc.includes(inv.nomor)).pop();
+            if (lastPayment) {
+                appData.transaksi = appData.transaksi.filter(t => t.id !== lastPayment.id);
+            }
+            saveData();
+            refreshCurrentPage();
+        }
+
+        // =============================================
+        // INVOICE - DOWNLOAD PDF
+        // =============================================
+        function downloadInvoicePDF(id) {
+            const inv = appData.invoice.find(i => i.id === id);
+            if (!inv) return;
+
+            // Render preview dulu jika belum di halaman detail
+            const previewHtml = buildInvoicePreviewHTML(inv);
+
+            // Buat container sementara
+            const div = document.createElement('div');
+            div.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:white;padding:40px;z-index:9999;';
+            div.innerHTML = previewHtml;
+            document.body.appendChild(div);
+
+            html2canvas(div, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+                const pdfW = 210;
+                const pdfH = 297;
+                const margin = 10;
+                const imgW = pdfW - margin * 2;
+                const imgH = (canvas.height * imgW) / canvas.width;
+
+                let heightLeft = imgH;
+                let position = margin;
+                let page = 1;
+
+                pdf.addImage(imgData, 'PNG', margin, position, imgW, imgH);
+                heightLeft -= pdfH - margin;
+
+                while (heightLeft > 0) {
+                    position = -(pdfH * page - margin);
+                    page++;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', margin, position, imgW, imgH);
+                    heightLeft -= pdfH - margin;
+                }
+
+                pdf.save('invoice-' + inv.nomor + '.pdf');
+                document.body.removeChild(div);
+            }).catch(() => {
+                document.body.removeChild(div);
+                // Fallback ke print
+                window.print();
+            });
+        }
+
+        function buildInvoicePreviewHTML(inv) {
+            const total = hitungTotalInvoice(inv.items);
+            const isPaid = inv.status === 'paid';
+            const paymentAcc = inv.paymentAccountId ? appData.bukuKas.find(b => b.id === inv.paymentAccountId) : null;
+            const itemsHtml = inv.items.map((item, idx) => {
+                const subtotal = (item.qty * item.harga) - item.diskon;
+                return `<tr>
+                    <td style="text-align:center;padding:10px 8px;border-bottom:1px solid #f1f5f9;color:#94a3b8;font-size:12px;">${idx + 1}</td>
+                    <td style="padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;">${item.nama}</td>
+                    <td style="text-align:center;padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:13px;">${item.qty}</td>
+                    <td style="text-align:center;padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#64748b;">${item.satuan || '-'}</td>
+                    <td style="text-align:right;padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:13px;">${formatRupiah(item.harga)}</td>
+                    <td style="text-align:right;padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:13px;">${item.diskon > 0 ? formatRupiah(item.diskon) : '-'}</td>
+                    <td style="text-align:right;padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;">${formatRupiah(subtotal)}</td>
+                </tr>`;
+            }).join('');
+
+            return `
+                <div style="font-family:'Inter',sans-serif;color:#0f172a;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #6366f1;margin-bottom:20px;">
+                        <div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA" style="height:28px;border-radius:6px;">
+                            <div>
+                                <div style="font-size:20px;font-weight:800;color:#0f172a;">SABINTA</div>
+                                <div style="font-size:10px;color:#94a3b8;">THE RIGHT SOLUTION FOR YOUR NEEDS</div>
+                            </div>
+                        </div>
+                        </div>
+                        <div style="padding:5px 14px;border-radius:20px;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;${isPaid ? 'background:#d1fae5;color:#059669;' : 'background:#fef3c7;color:#d97706;'}">${isPaid ? 'LUNAS' : 'BELUM DIBAYAR'}</div>
+                    </div>
+                    <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <div style="font-size:14px;color:#475569;">Kode Invoice: <strong style="color:#6366f1;white-space:nowrap;">${inv.nomor}</strong></div>
+                        <div style="font-size:13px;color:#475569;">Tgl. Order: <strong>${inv.tanggal ? new Date(inv.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</strong></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f8fafc;border-radius:8px;">
+                        <div>
+                            <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Kepada</div>
+                            <div style="font-size:14px;font-weight:600;">${inv.customer}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Pembayaran Via</div>
+                            <div style="font-size:14px;font-weight:600;">${inv.metode || (paymentAcc ? paymentAcc.nama : '-')}</div>
+                            ${paymentAcc && paymentAcc.norek && paymentAcc.norek !== '-' && paymentAcc.id !== 'cash' ? `<div style="font-size:11px;color:#94a3b8;margin-top:2px;">${paymentAcc.norek}</div>` : ''}
+                        </div>
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;border-radius:8px 0 0 0;">#</th>
+                                <th style="padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;">Produk / Jasa</th>
+                                <th style="text-align:center;padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;">Qty</th>
+                                <th style="text-align:center;padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;">Satuan</th>
+                                <th style="text-align:right;padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;">Harga</th>
+                                <th style="text-align:right;padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;">Diskon</th>
+                                <th style="text-align:right;padding:10px 8px;background:#0f172a;color:white;font-size:11px;font-weight:600;text-transform:uppercase;border-radius:0 8px 0 0;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>${itemsHtml}</tbody>
+                    </table>
+                    <div style="display:flex;gap:24px;margin-top:8px;">
+                        <div style="flex:1;min-width:0;">
+                            ${isPaid ? `
+                            <div style="padding:14px;background:#f8fafc;border:1px solid rgba(99,102,241,0.08);border-radius:10px;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(inv.nomor)}" alt="QR" style="width:90px;height:90px;display:block;margin-bottom:6px;border-radius:6px;">
+                                <div style="font-size:14px;font-weight:700;color:#6366f1;letter-spacing:1px;">SABINTA</div>
+                                <div style="font-size:8px;color:#94a3b8;margin-top:2px;">DIGITALLY SIGNED &amp; VERIFIED</div>
+                            </div>
+                            ` : `
+                            <div style="padding:10px 12px;background:#f8fafc;border:1px solid rgba(99,102,241,0.06);border-radius:8px;">
+                                <div style="font-size:11px;font-weight:700;color:#0f172a;margin-bottom:6px;">Pembayaran Via:</div>
+                                <div style="font-size:11px;color:#475569;margin-bottom:2px;">Bank BRI Account: <strong>683301012398536</strong> <i class="fas fa-copy" onclick="copyText('683301012398536', this)" style="font-size:10px;color:#6366f1;cursor:pointer;" title="Salin nomor rekening"></i></div>
+                                <div style="font-size:11px;color:#475569;margin-bottom:2px;">Shopeepay: <strong>083826271995</strong> <i class="fas fa-copy" onclick="copyText('083826271995', this)" style="font-size:10px;color:#6366f1;cursor:pointer;" title="Salin nomor Shopeepay"></i></div>
+                                <div style="font-size:10px;color:#94a3b8;">a.n FITRIANTO</div>
+                            </div>
+                            `}
+                        </div>
+                        <div style="flex-shrink:0;width:280px;max-width:100%;">
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#475569;">
+                                <span>Subtotal</span>
+                                <span>${formatRupiah(total)}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;color:#94a3b8;">
+                                <span>Pajak (0%)</span>
+                                <span>Rp0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid #0f172a;font-size:18px;font-weight:700;color:#0f172a;">
+                                <span>Grand Total</span>
+                                <span>${formatRupiah(total)}</span>
+                            </div>
+                            ${isPaid ? `
+                            <div style="margin-top:8px;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;align-items:center;gap:6px;">
+                                <span style="font-size:13px;">✅</span>
+                                <span style="font-size:10px;font-weight:600;color:#16a34a;">Invoice ini sudah LUNAS. Terima kasih.</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ${inv.catatan ? `
+                    <div style="margin-top:24px;padding:16px;background:#fef9c3;border-radius:8px;font-size:12px;color:#92400e;">
+                        <strong style="display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;">Catatan</strong>
+                        ${inv.catatan}
+                    </div>` : ''}
+                    <div style="text-align:center;padding-top:24px;margin-top:24px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;">
+                        Terima kasih atas kepercayaan Anda &middot; THE RIGHT SOLUTION FOR YOUR NEEDS &middot; SABINTA
+                    </div>
+                </div>
+            `;
+        }
+
+        // =============================================
+        // COPY TEXT
+        // =============================================
+        function copyText(text, el) {
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = el.innerHTML;
+                el.innerHTML = 'Tersalin!';
+                el.style.fontSize = '10px';
+                el.style.fontStyle = 'normal';
+                setTimeout(() => {
+                    el.innerHTML = orig;
+                    el.style.fontSize = '';
+                    el.style.fontStyle = '';
+                }, 1500);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            });
+        }
+
+        // =============================================
+        // INVOICE - SHARE
+        // =============================================
+        function shareInvoice(id) {
+            const inv = appData.invoice.find(i => i.id === id);
+            if (!inv) return;
+            const total = hitungTotalInvoice(inv.items);
+
+            const itemsText = inv.items.map(item =>
+                `  - ${item.nama}: ${item.qty} x Rp${item.harga.toLocaleString('id-ID')}${item.diskon > 0 ? ' (diskon Rp' + item.diskon.toLocaleString('id-ID') + ')' : ''}`
+            ).join('\n');
+
+            const shareText = `INVOICE ${inv.nomor}
+            Pelanggan: ${inv.customer}
+            Status: ${inv.status === 'paid' ? 'LUNAS' : 'BELUM DIBAYAR'}
+            Jatuh Tempo: ${new Date(inv.jatuhTempo).toLocaleDateString('id-ID')}
+
+            Detail Pesanan:
+            ${itemsText}
+
+            GRAND TOTAL: Rp${total.toLocaleString('id-ID')}
+
+            ---
+            THE RIGHT SOLUTION FOR YOUR NEEDS
+            ---
+            SABINTA`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Invoice ' + inv.nomor,
+                    text: shareText,
+                }).catch(() => {});
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('Detail invoice disalin ke clipboard!');
+                }).catch(() => {
+                    alert('Gagal membagikan invoice. Silakan screenshot manual.');
+                });
+            }
+        }
+
+        function refreshCurrentPage() {
+            const active = document.querySelector('.hidden-page.active') || document.getElementById('page-dashboard');
+            if (active.id === 'page-dashboard') renderDashboard();
+            else if (active.id === 'page-buku-kas') { renderBukuKasList(); renderRincianPerRekening(); }
+            else if (active.id === 'page-invoice') renderInvoice();
+            else if (active.id === 'page-invoice-detail' && currentInvoiceId) renderInvoiceDetail(currentInvoiceId);
+            else if (active.id === 'page-utang') renderUtang();
+            else if (active.id === 'page-piutang') renderPiutang();
+            else if (active.id === 'page-laporan') renderLaporan();
+        }
+
+        // =============================================
+        // INISIALISASI
+        // =============================================
+        document.getElementById('tanggalHariIni').textContent = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        renderDashboard();
+    </script>
+</body>
+</html>
