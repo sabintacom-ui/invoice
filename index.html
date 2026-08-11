@@ -221,6 +221,16 @@
         .widget-box:hover { border-color: rgba(99,102,241,0.15); box-shadow: var(--shadow-md); }
         .widget-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; color: #0f172a; }
         .widget-sub { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+        .widget-box label { display: block; margin: 12px 0 4px; font-size: 13px; font-weight: 600; color: #475569; }
+        .widget-box input, .widget-box select, .widget-box textarea {
+            width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px;
+            font-size: 14px; margin-bottom: 6px; background: white; min-height: 46px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: #0f172a;
+        }
+        .widget-box input:focus, .widget-box select:focus {
+            border-color: #6366f1; outline: none; box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+        }
         .chart-area { height: 140px; display: flex; align-items: flex-end; gap: 6px; padding: 0; }
         .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
         .chart-bar { width: 100%; background: linear-gradient(180deg, #6366f1, #4f46e5); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -964,7 +974,7 @@
         <a href="#" class="menu-item" onclick="showPage('piutang')"><i class="fas fa-hand-holding-dollar"></i> Piutang</a>
         <a href="#" class="menu-item" onclick="showPage('laporan')"><i class="fas fa-chart-pie"></i> Laporan</a>
         <div class="menu-header">Akun</div>
-        <a href="#" class="menu-item" onclick="openModal('settings')"><i class="fas fa-user-cog"></i> Pengaturan</a>
+        <a href="#" class="menu-item" onclick="showPage('pengaturan')"><i class="fas fa-user-cog"></i> Pengaturan</a>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -986,6 +996,13 @@
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="stats-grid" id="statsGrid"></div>
+            <div id="attentionWrap" style="display:none;margin-bottom:16px;">
+                <div class="widget-box">
+                    <div class="widget-title"><i class="fas fa-exclamation-circle" style="color:#f59e0b;"></i> Perlu Perhatian</div>
+                    <div class="widget-sub">Piutang &amp; utang yang jatuh tempo dalam 7 hari ke depan</div>
+                    <div id="attentionList"></div>
+                </div>
+            </div>
             <div class="bottom-grid">
                 <div class="widget-box">
                     <div class="widget-title"><i class="fas fa-chart-line" style="color:#6366f1;"></i> Arus Kas</div>
@@ -1136,6 +1153,18 @@
                 </table>
             </div>
         </div>
+
+        <!-- PENGATURAN -->
+        <div id="page-pengaturan" class="hidden-page">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;"><i class="fas fa-chevron-right" style="font-size:8px;"></i> AKUN <i class="fas fa-chevron-right" style="font-size:8px;"></i> PENGATURAN</div>
+                <div>
+                    <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Pengaturan</h2>
+                    <p style="font-size:13px; color:#64748b; margin-top:2px;">Kelola profil bisnis, sinkronisasi cloud, dan data aplikasi.</p>
+                </div>
+            </div>
+            <div id="pengaturanContent"></div>
+        </div>
     </div>
     </div>
 
@@ -1188,14 +1217,32 @@
             transaksi: [],
             utang: [],
             piutang: [],
-            invoice: []
+            invoice: [],
+            setting: {
+                namaUsaha: 'SABINTA',
+                tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
+                alamat: '',
+                telepon: '',
+                email: ''
+            }
         };
 
         // Load awal dari localStorage. Setelah itu Supabase akan menjadi sumber data utama.
         if (localStorage.getItem('sabintaPremiumData')) {
             try {
                 const saved = JSON.parse(localStorage.getItem('sabintaPremiumData'));
-                if (saved && typeof saved === 'object') { appData = saved; }
+                if (saved && typeof saved === 'object') {
+                    appData = saved;
+                    if (!appData.setting) {
+                        appData.setting = {
+                            namaUsaha: 'SABINTA',
+                            tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
+                            alamat: '',
+                            telepon: '',
+                            email: ''
+                        };
+                    }
+                }
             } catch(e) {}
         }
 
@@ -1251,6 +1298,7 @@
 
                 if (data && data.data) {
                     appData = data.data;
+                    normalizeAppData();
                     localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
                     onlineReady = true;
                     refreshCurrentPage();
@@ -1272,6 +1320,7 @@
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state', filter: `id=eq.${ONLINE_STATE_ID}` }, payload => {
                     if (!payload.new || !payload.new.data) return;
                     appData = payload.new.data;
+                    normalizeAppData();
                     localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
                     refreshCurrentPage();
                     setSyncStatus('✓ Sinkron dari perangkat lain');
@@ -1296,6 +1345,213 @@
             location.reload();
         }
 
+        function normalizeAppData() {
+            appData.bukuKas = appData.bukuKas || [];
+            appData.transaksi = appData.transaksi || [];
+            appData.utang = appData.utang || [];
+            appData.piutang = appData.piutang || [];
+            appData.invoice = appData.invoice || [];
+            appData.setting = Object.assign({
+                namaUsaha: 'SABINTA',
+                tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
+                alamat: '',
+                telepon: '',
+                email: ''
+            }, appData.setting || {});
+        }
+
+        // =============================================
+        // PENGATURAN PAGE
+        // =============================================
+        let lastSyncLabel = 'Belum tersinkron';
+
+        function renderPengaturan() {
+            const s = appData.setting;
+            document.getElementById('pengaturanContent').innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr;gap:16px;">
+                    <div class="widget-box">
+                        <div class="widget-title"><i class="fas fa-store" style="color:#6366f1;"></i> Profil Bisnis</div>
+                        <div class="widget-sub">Informasi ini tampil di invoice, PDF, dan laporan.</div>
+                        <label>Nama Usaha</label>
+                        <input type="text" id="s_namaUsaha" value="${escapeHtml(s.namaUsaha)}" placeholder="Nama usaha Anda">
+                        <label>Tagline (Opsional)</label>
+                        <input type="text" id="s_tagline" value="${escapeHtml(s.tagline)}" placeholder="Slogan usaha">
+                        <label>Alamat</label>
+                        <input type="text" id="s_alamat" value="${escapeHtml(s.alamat)}" placeholder="Alamat usaha">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div>
+                                <label>Telepon / WA</label>
+                                <input type="text" id="s_telepon" value="${escapeHtml(s.telepon)}" placeholder="08xxxxxxxxxx">
+                            </div>
+                            <div>
+                                <label>Email</label>
+                                <input type="email" id="s_email" value="${escapeHtml(s.email)}" placeholder="email@usaha.com">
+                            </div>
+                        </div>
+                        <div class="modal-actions" style="margin-top:16px;">
+                            <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Simpan Profil</button>
+                        </div>
+                    </div>
+
+                    <div class="widget-box">
+                        <div class="widget-title"><i class="fas fa-cloud-upload-alt" style="color:#10b981;"></i> Sinkronisasi Cloud</div>
+                        <div class="widget-sub">Data tersimpan otomatis di Supabase dan tersinkron antar perangkat (realtime).</div>
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+                            <span id="syncStatusBadge" class="tag-status tag-lunas" style="background:#f1f5f9;color:#64748b;">● Memeriksa…</span>
+                            <span style="font-size:12px;color:#64748b;" id="syncLastLabel">${lastSyncLabel}</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                            <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;">
+                                <div style="font-size:11px;color:#94a3b8;font-weight:600;">ID DATA CLOUD</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;word-break:break-all;">${ONLINE_STATE_ID}</div>
+                            </div>
+                            <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;">
+                                <div style="font-size:11px;color:#94a3b8;font-weight:600;">JUMLAH DATA</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;">${appData.bukuKas.length} rekening · ${appData.transaksi.length} transaksi · ${appData.invoice.length} invoice</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="syncNow()"><i class="fas fa-sync-alt"></i> Sinkron Sekarang</button>
+                    </div>
+
+                    <div class="widget-box">
+                        <div class="widget-title"><i class="fas fa-database" style="color:#8b5cf6;"></i> Backup &amp; Restore</div>
+                        <div class="widget-sub">Simpan seluruh data ke file JSON, atau pulihkan dari file backup.</div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <button class="btn btn-primary" onclick="exportBackup()"><i class="fas fa-download"></i> Export Backup (.json)</button>
+                            <button class="btn btn-cancel" style="background:#f1f5f9;color:#475569;" onclick="document.getElementById('importBackupInput').click()"><i class="fas fa-upload"></i> Restore dari File</button>
+                            <input type="file" id="importBackupInput" accept=".json,application/json" style="display:none;" onchange="importBackup(this)">
+                        </div>
+                        <div style="margin-top:10px;font-size:11px;color:#94a3b8;"><i class="fas fa-info-circle"></i> Backup berisi semua data lokal + cloud. Simpan di tempat aman.</div>
+                    </div>
+
+                    <div class="widget-box" style="border:1px solid rgba(239,68,68,0.2);">
+                        <div class="widget-title"><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> Zona Bahaya</div>
+                        <div class="widget-sub">Menghapus seluruh data di perangkat ini dan cloud. Tidak bisa dibatalkan.</div>
+                        <button class="btn btn-danger" onclick="resetAllData()"><i class="fas fa-trash-alt"></i> Reset Semua Data</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveSettings() {
+            const val = id => document.getElementById(id) ? document.getElementById(id).value.trim() : '';
+            appData.setting = {
+                namaUsaha: val('s_namaUsaha') || 'SABINTA',
+                tagline: val('s_tagline') || '',
+                alamat: val('s_alamat'),
+                telepon: val('s_telepon'),
+                email: val('s_email')
+            };
+            saveData();
+            showToast('Profil bisnis disimpan', 'success');
+            renderPengaturan();
+        }
+
+        function exportBackup() {
+            const payload = JSON.stringify(appData, null, 2);
+            const blob = new Blob([payload], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sabinta-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            showToast('Backup diunduh', 'success');
+        }
+
+        function importBackup(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            if (!confirm('Restore data dari file ini? Seluruh data saat ini akan digantikan oleh isi file backup.')) { input.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = async e => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.bukuKas) || !Array.isArray(parsed.transaksi) || !Array.isArray(parsed.invoice)) {
+                        throw new Error('Format file tidak valid');
+                    }
+                    appData = parsed;
+                    normalizeAppData();
+                    saveData();
+                    await saveOnlineData();
+                    refreshCurrentPage();
+                    showToast('Data berhasil di-restore', 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Gagal restore: file tidak valid', 'error');
+                } finally {
+                    input.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function syncNow() {
+            if (!onlineReady) {
+                setSyncStatus('Menghubungkan…');
+                await loadOnlineData();
+                showToast(onlineReady ? 'Sinkronisasi berhasil' : 'Gagal terhubung ke cloud', onlineReady ? 'success' : 'error');
+                if (onlineReady) updateSyncStatusUI();
+                return;
+            }
+            setSyncStatus('Menyimpan…');
+            await saveOnlineData();
+            updateSyncStatusUI();
+        }
+
+        function updateSyncStatusUI() {
+            const badge = document.getElementById('syncStatusBadge');
+            const label = document.getElementById('syncLastLabel');
+            if (!badge) return;
+            if (onlineReady) {
+                badge.className = 'tag-status tag-lunas';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#16a34a';
+                badge.textContent = '● Online & Tersinkron';
+            } else {
+                badge.className = 'tag-status tag-bayar';
+                badge.style.background = '#fef2f2';
+                badge.style.color = '#dc2626';
+                badge.textContent = '● Offline';
+            }
+            lastSyncLabel = 'Terakhir: ' + new Date().toLocaleTimeString('id-ID');
+            label.textContent = lastSyncLabel;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // =============================================
+        // TOAST
+        // =============================================
+        function showToast(message, type = 'info') {
+            let box = document.getElementById('toastBox');
+            if (!box) {
+                box = document.createElement('div');
+                box.id = 'toastBox';
+                box.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;align-items:center;';
+                document.body.appendChild(box);
+            }
+            const toast = document.createElement('div');
+            const colors = {
+                success: { bg: '#10b981', icon: 'fa-check-circle' },
+                error: { bg: '#ef4444', icon: 'fa-exclamation-circle' },
+                info: { bg: '#6366f1', icon: 'fa-info-circle' }
+            };
+            const c = colors[type] || colors.info;
+            toast.style.cssText = 'display:flex;align-items:center;gap:8px;background:' + c.bg + ';color:white;padding:11px 18px;border-radius:999px;font:600 13px Arial;box-shadow:0 6px 24px rgba(0,0,0,0.2);animation:modalIn 0.25s ease;';
+            toast.innerHTML = '<i class="fas ' + c.icon + '"></i> ' + message;
+            box.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s, transform 0.3s';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2600);
+        }
+
         // =============================================
         // UTILITY
         // =============================================
@@ -1314,6 +1570,16 @@
 
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        function nextInvoiceNumber() {
+            const year = new Date().getFullYear();
+            let maxSeq = 0;
+            appData.invoice.forEach(inv => {
+                const m = String(inv.nomor || '').match(new RegExp('^INV-' + year + '-(\\d+)$'));
+                if (m) maxSeq = Math.max(maxSeq, parseInt(m[1], 10));
+            });
+            return 'INV-' + year + '-' + String(maxSeq + 1).padStart(3, '0');
         }
 
         const warnaBuku = ['#10b981','#6366f1','#8b5cf6','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316'];
@@ -1394,6 +1660,56 @@
                     `;
                 }).join('');
             }
+            renderAttention();
+        }
+
+        function renderAttention() {
+            const wrap = document.getElementById('attentionWrap');
+            const list = document.getElementById('attentionList');
+            if (!wrap || !list) return;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const watch = [];
+            appData.piutang.filter(p => !p.lunas).forEach(p => {
+                const d = new Date(p.jatuhTempo + 'T00:00:00');
+                d.setHours(0, 0, 0, 0);
+                const days = Math.round((d - today) / 86400000);
+                if (days <= 7) watch.push({ tipe: 'piutang', id: p.id, nama: p.nama, nominal: p.nominal, jatuhTempo: p.jatuhTempo, days });
+            });
+            appData.utang.filter(u => !u.lunas).forEach(u => {
+                const d = new Date(u.jatuhTempo + 'T00:00:00');
+                d.setHours(0, 0, 0, 0);
+                const days = Math.round((d - today) / 86400000);
+                if (days <= 7) watch.push({ tipe: 'utang', id: u.id, nama: u.nama, nominal: u.nominal, jatuhTempo: u.jatuhTempo, days });
+            });
+            watch.sort((a, b) => a.days - b.days);
+
+            wrap.style.display = watch.length ? 'block' : 'none';
+            if (watch.length === 0) { list.innerHTML = ''; return; }
+
+            list.innerHTML = watch.slice(0, 6).map(item => {
+                const isPiutang = item.tipe === 'piutang';
+                const badge = item.days < 0
+                    ? '<span class="tag-status tag-bayar" style="font-size:10px;padding:2px 8px;">Terlambat ' + Math.abs(item.days) + ' hari</span>'
+                    : item.days === 0
+                        ? '<span class="tag-status tag-pending" style="font-size:10px;padding:2px 8px;">Hari ini</span>'
+                        : '<span class="tag-status tag-pending" style="font-size:10px;padding:2px 8px;">' + item.days + ' hari lagi</span>';
+                return `
+                    <div class="activity-item" style="cursor:pointer;" onclick="showPage('${isPiutang ? 'piutang' : 'utang'}')">
+                        <div class="icon-circle" style="background:${isPiutang ? '#8b5cf6' : '#f59e0b'};">
+                            <i class="fas ${isPiutang ? 'fa-hand-holding-dollar' : 'fa-hand-holding-usd'}"></i>
+                        </div>
+                        <div class="act-info">
+                            <div class="act-title">${isPiutang ? 'Piutang' : 'Utang'} • ${escapeHtml(item.nama)}</div>
+                            <div class="act-date">Jatuh tempo ${new Date(item.jatuhTempo + 'T00:00:00').toLocaleDateString('id-ID')}</div>
+                        </div>
+                        <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                            <div class="act-amount" style="color:${isPiutang ? '#7c3aed' : '#d97706'};">${formatRupiah(item.nominal)}</div>
+                            ${badge}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderBukuKasList() {
@@ -1718,6 +2034,16 @@
             renderInvoice();
         }
 
+        function getSetting() {
+            if (!appData.setting) normalizeAppData();
+            return appData.setting;
+        }
+
+        function getContactLine() {
+            const S = getSetting();
+            return [S.alamat, S.telepon, S.email].filter(Boolean).join(' · ');
+        }
+
         function renderInvoiceDetail(id) {
             const inv = appData.invoice.find(i => i.id === id);
             if (!inv) {
@@ -1726,6 +2052,8 @@
             }
             const total = hitungTotalInvoice(inv.items);
             const isPaid = inv.status === 'paid';
+            const S = getSetting();
+            const contactLine = getContactLine();
             const paymentAcc = inv.paymentAccountId ? appData.bukuKas.find(b => b.id === inv.paymentAccountId) : null;
 
             let itemsHtml = inv.items.map((item, idx) => {
@@ -1748,10 +2076,11 @@
                     <div class="inv-preview-header">
                         <div class="brand">
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA" style="height:32px;border-radius:6px;">
+                                <img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="${S.namaUsaha}" style="height:32px;border-radius:6px;">
                                 <div>
-                                    <div style="font-size:20px;font-weight:800;color:#0f172a;">SABINTA</div>
-                                    <small style="font-size:10px;color:#94a3b8;">THE RIGHT SOLUTION FOR YOUR NEEDS</small>
+                                    <div style="font-size:20px;font-weight:800;color:#0f172a;">${S.namaUsaha}</div>
+                                    <small style="font-size:10px;color:#94a3b8;">${S.tagline || ''}</small>
+                                    ${contactLine ? `<small style="font-size:9px;color:#94a3b8;margin-top:1px;">${contactLine}</small>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1799,7 +2128,7 @@
                             ${isPaid ? `
                             <div style="padding:14px;background:#f8fafc;border:1px solid rgba(99,102,241,0.08);border-radius:10px;">
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(inv.nomor)}" alt="QR" style="width:90px;height:90px;display:block;margin-bottom:6px;border-radius:6px;">
-                                <div style="font-size:14px;font-weight:700;color:#6366f1;letter-spacing:1px;">SABINTA</div>
+                                <div style="font-size:14px;font-weight:700;color:#6366f1;letter-spacing:1px;">${S.namaUsaha}</div>
                                 <div style="font-size:8px;color:#94a3b8;margin-top:2px;">DIGITALLY SIGNED &amp; VERIFIED</div>
                             </div>
                             ` : `
@@ -1813,7 +2142,7 @@
                                     <span style="font-size:11px;color:#475569;">Shopeepay: <strong>083826271995</strong></span>
                                     <i class="fas fa-copy" onclick="copyText('083826271995', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin nomor Shopeepay"></i>
                                 </div>
-                                <div style="font-size:10px;color:#94a3b8;">a.n FITRIANTO</div>
+                                <div style="font-size:10px;color:#94a3b8;">a.n ${S.namaUsaha}</div>
                             </div>
                             `}
                         </div>
@@ -1847,7 +2176,7 @@
                     </div>
 
                     <div class="inv-preview-footer">
-                        THE RIGHT SOLUTION FOR YOUR NEEDS &middot; SABINTA
+                        ${S.tagline ? S.tagline + ' &middot; ' : ''}${S.namaUsaha}
                     </div>
                 </div>
             `;
@@ -1893,12 +2222,13 @@
         function exportPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            const S = getSetting();
             const sorted = [...appData.transaksi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
             
-            doc.text('SABINTA - Laporan Keuangan', 14, 20);
+            doc.text(S.namaUsaha + ' - Laporan Keuangan', 14, 20);
             doc.setFontSize(8);
             doc.setTextColor(148, 163, 184);
-            doc.text('THE RIGHT SOLUTION FOR YOUR NEEDS', 14, 27);
+            if (S.tagline) doc.text(S.tagline, 14, 27);
             doc.text('Tanggal: ' + new Date().toLocaleDateString('id-ID'), 14, 30);
             
             const data = sorted.map(t => [
@@ -1970,10 +2300,17 @@
                 document.getElementById('pageTitle').textContent = 'Laporan';
                 renderLaporan();
                 if (window.innerWidth <= 768) toggleSidebar();
+            } else if (pageId === 'pengaturan') {
+                document.getElementById('page-pengaturan').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Pengaturan';
+                renderPengaturan();
+                updateSyncStatusUI();
+                if (window.innerWidth <= 768) toggleSidebar();
             }
 
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.menu-item').classList.add('active');
+            const menuEl = event && event.target && event.target.closest ? event.target.closest('.menu-item') : null;
+            if (menuEl) menuEl.classList.add('active');
         }
 
         // =============================================
@@ -2105,6 +2442,12 @@
 
                 body.innerHTML = `
                     <div class="invoice-form-card">
+                        ${!editId ? `
+                        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(99,102,241,0.06);border:1px dashed rgba(99,102,241,0.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;">
+                            <span style="font-size:12px;color:#475569;font-weight:600;">Nomor invoice berikutnya</span>
+                            <strong style="font-size:13px;color:#6366f1;letter-spacing:0.5px;">${nextInvoiceNumber()}</strong>
+                        </div>
+                        ` : ''}
                         <div>
                             <label><i class="fas fa-user"></i> Nama Pelanggan</label>
                             <input type="text" id="f_customer" value="${data ? data.customer : ''}" placeholder="Ketik atau pilih pelanggan...">
@@ -2152,15 +2495,6 @@
                     });
                     updateInvoiceTotal();
                 }, 100);
-            } else if (mode === 'settings') {
-                title.textContent = '⚙️ Pengaturan';
-                body.innerHTML = `
-                    <div style="display:flex;flex-direction:column;gap:14px;padding:4px 0;">
-                        <div style="font-size:13px;color:#64748b;text-align:center;">Reset menghapus SELURUH data (buku kas, transaksi, utang, piutang, invoice) dari perangkat ini dan cloud. Tindakan ini tidak bisa dibatalkan.</div>
-                        <button type="button" class="btn btn-danger" onclick="resetAllData()" style="width:100%;"><i class="fas fa-trash-alt"></i> Reset Semua Data</button>
-                    </div>
-                `;
-                saveBtn.style.display = 'none';
             }
             modal.classList.add('open');
         }
@@ -2399,7 +2733,7 @@
                         inv.catatan = catatan;
                     }
                 } else {
-                    const nomor = 'INV-' + new Date().getFullYear() + '-' + String(appData.invoice.length + 1).padStart(3, '0');
+                    const nomor = nextInvoiceNumber();
                     appData.invoice.push({
                         id: 'inv' + generateId(),
                         nomor: nomor,
@@ -2462,10 +2796,11 @@
         function bayarUtang(id) {
             const utang = appData.utang.find(u => u.id === id);
             if (!utang || utang.lunas) return;
-            if (!confirm(`Bayar utang ${utang.nama} sebesar ${formatRupiah(utang.nominal)}? (Uang akan diambil dari buku kas: Cash)`)) return;
-            const buku = appData.bukuKas.find(b => b.id === 'cash');
+            const buku = appData.bukuKas[0];
+            if (!buku) { alert('Tambahkan buku kas terlebih dahulu!'); return; }
+            if (!confirm(`Bayar utang ${utang.nama} sebesar ${formatRupiah(utang.nominal)}? (Uang akan diambil dari buku kas: ${buku.nama})`)) return;
             if (buku.saldo < utang.nominal) {
-                alert('Saldo Cash tidak mencukupi!');
+                alert(`Saldo ${buku.nama} tidak mencukupi!`);
                 return;
             }
             buku.saldo -= utang.nominal;
@@ -2473,7 +2808,7 @@
             appData.transaksi.push({
                 id: 't' + generateId(),
                 tanggal: new Date().toISOString(),
-                bukuId: 'cash',
+                bukuId: buku.id,
                 tipe: 'keluar',
                 nominal: utang.nominal,
                 kategori: 'Bayar Utang',
@@ -2481,14 +2816,15 @@
             });
             saveData();
             refreshCurrentPage();
-            alert('Utang berhasil dibayar!');
+            showToast('Utang berhasil dibayar', 'success');
         }
 
         function unbayarUtang(id) {
             const utang = appData.utang.find(u => u.id === id);
             if (!utang || !utang.lunas) return;
-            if (!confirm(`Batalkan pembayaran utang ${utang.nama}? Saldo Cash akan dikembalikan.`)) return;
-            const buku = appData.bukuKas.find(b => b.id === 'cash');
+            const buku = appData.bukuKas.find(b => b.id === utang.bukuId) || appData.bukuKas[0];
+            if (!buku) { alert('Buku kas tidak ditemukan!'); return; }
+            if (!confirm(`Batalkan pembayaran utang ${utang.nama}? Saldo ${buku.nama} akan dikembalikan.`)) return;
             buku.saldo += utang.nominal;
             utang.lunas = false;
             const lastPayment = appData.transaksi.filter(t => t.desc && t.desc.includes(utang.nama)).pop();
@@ -2497,7 +2833,7 @@
             }
             saveData();
             refreshCurrentPage();
-            alert('Status utang dikembalikan ke belum lunas!');
+            showToast('Status utang kembali belum lunas', 'success');
         }
 
         function editUtang(id) {
@@ -2517,14 +2853,15 @@
         function terimaPiutang(id) {
             const piutang = appData.piutang.find(p => p.id === id);
             if (!piutang || piutang.lunas) return;
-            if (!confirm(`Terima pembayaran piutang dari ${piutang.nama} sebesar ${formatRupiah(piutang.nominal)}? (Uang akan masuk ke buku kas: BRI)`)) return;
-            const buku = appData.bukuKas.find(b => b.id === 'bri');
+            const buku = appData.bukuKas[0];
+            if (!buku) { alert('Tambahkan buku kas terlebih dahulu!'); return; }
+            if (!confirm(`Terima pembayaran piutang dari ${piutang.nama} sebesar ${formatRupiah(piutang.nominal)}? (Uang akan masuk ke buku kas: ${buku.nama})`)) return;
             buku.saldo += piutang.nominal;
             piutang.lunas = true;
             appData.transaksi.push({
                 id: 't' + generateId(),
                 tanggal: new Date().toISOString(),
-                bukuId: 'bri',
+                bukuId: buku.id,
                 tipe: 'masuk',
                 nominal: piutang.nominal,
                 kategori: 'Terima Piutang',
@@ -2532,14 +2869,15 @@
             });
             saveData();
             refreshCurrentPage();
-            alert('Piutang berhasil diterima!');
+            showToast('Piutang berhasil diterima', 'success');
         }
 
         function unbayarPiutang(id) {
             const piutang = appData.piutang.find(p => p.id === id);
             if (!piutang || !piutang.lunas) return;
-            if (!confirm(`Batalkan penerimaan piutang ${piutang.nama}? Saldo BRI akan dikurangi.`)) return;
-            const buku = appData.bukuKas.find(b => b.id === 'bri');
+            const buku = appData.bukuKas.find(b => b.id === piutang.bukuId) || appData.bukuKas[0];
+            if (!buku) { alert('Buku kas tidak ditemukan!'); return; }
+            if (!confirm(`Batalkan penerimaan piutang ${piutang.nama}? Saldo ${buku.nama} akan dikurangi.`)) return;
             buku.saldo -= piutang.nominal;
             piutang.lunas = false;
             const lastPayment = appData.transaksi.filter(t => t.desc && t.desc.includes(piutang.nama)).pop();
@@ -2548,7 +2886,7 @@
             }
             saveData();
             refreshCurrentPage();
-            alert('Status piutang dikembalikan ke belum lunas!');
+            showToast('Status piutang kembali belum lunas', 'success');
         }
 
         function editPiutang(id) {
@@ -2568,12 +2906,16 @@
         let paymentInvoiceId = null;
         let selectedPaymentMethod = null;
 
-        const paymentMethods = [
-            { id: 'bri', nama: 'BRI', icon: 'fa-university', color: '#2563eb' },
-            { id: 'cash', nama: 'Cash', icon: 'fa-money-bill-wave', color: '#10b981' },
-            { id: 'shopeepay', nama: 'ShopeePay', icon: 'fa-mobile-alt', color: '#ee4d2d' },
-            { id: 'qris', nama: 'QRIS', icon: 'fa-qrcode', color: '#8b5cf6' }
-        ];
+        function getPaymentMethods() {
+            const icons = ['fa-money-bill-wave','fa-university','fa-mobile-alt','fa-qrcode','fa-wallet','fa-landmark','fa-credit-card','fa-building'];
+            const colors = ['#10b981','#2563eb','#ee4d2d','#8b5cf6','#f59e0b','#0ea5e9','#ef4444','#14b8a6'];
+            return appData.bukuKas.map((b, i) => ({
+                id: b.id,
+                nama: b.nama,
+                icon: b.icon || icons[i % icons.length],
+                color: colors[i % colors.length]
+            }));
+        }
 
         function openPaymentModal(id) {
             paymentInvoiceId = id;
@@ -2581,6 +2923,7 @@
             const inv = appData.invoice.find(i => i.id === id);
             if (!inv) return;
             const total = hitungTotalInvoice(inv.items);
+            const methods = getPaymentMethods();
 
             document.getElementById('paymentModalTitle').textContent = 'Pembayaran Invoice';
             document.getElementById('paymentModalBody').innerHTML = `
@@ -2593,15 +2936,20 @@
                         <span style="float:right;font-size:20px;font-weight:700;color:#0f172a;">${formatRupiah(total)}</span>
                     </div>
                 </div>
+                ${methods.length === 0 ? `
+                <div style="text-align:center;padding:18px;color:#94a3b8;font-size:13px;">
+                    <i class="fas fa-wallet" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                    Tambahkan buku kas terlebih dahulu di menu Buku Kas.
+                </div>` : `
                 <label style="font-size:13px;font-weight:600;color:#475569;margin-bottom:10px;display:block;">Pilih Metode Pembayaran</label>
                 <div id="paymentMethodList" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                    ${paymentMethods.map(m => `
+                    ${methods.map(m => `
                         <div class="payment-method-item" data-id="${m.id}" onclick="selectPaymentMethod('${m.id}')" style="padding:14px;border:2px solid #e2e8f0;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;">
                             <div style="font-size:28px;color:${m.color};margin-bottom:6px;"><i class="fas ${m.icon}"></i></div>
                             <div style="font-size:13px;font-weight:600;color:#0f172a;">${m.nama}</div>
                         </div>
                     `).join('')}
-                </div>
+                </div>`}
             `;
             document.getElementById('paymentSaveBtn').disabled = true;
             document.getElementById('paymentSaveBtn').style.opacity = '0.5';
@@ -2630,7 +2978,7 @@
             if (!selectedPaymentMethod || !paymentInvoiceId) return;
             const inv = appData.invoice.find(i => i.id === paymentInvoiceId);
             if (!inv || inv.status === 'paid') return;
-            const method = paymentMethods.find(m => m.id === selectedPaymentMethod);
+            const method = getPaymentMethods().find(m => m.id === selectedPaymentMethod);
             if (!method) return;
             const total = hitungTotalInvoice(inv.items);
             const buku = appData.bukuKas.find(b => b.id === method.id);
@@ -2650,6 +2998,7 @@
             saveData();
             closePaymentModal();
             refreshCurrentPage();
+            showToast('Pembayaran dicatat, invoice lunas', 'success');
         }
 
         // =============================================
@@ -2673,7 +3022,7 @@
             if (!inv || inv.status === 'unpaid') return;
             if (!confirm(`Kembalikan invoice ${inv.nomor} ke status Unpaid?`)) return;
             const total = hitungTotalInvoice(inv.items);
-            const buku = appData.bukuKas.find(b => b.id === inv.metode === 'BRI' ? 'bri' : 'cash');
+            const buku = appData.bukuKas.find(b => b.id === inv.paymentAccountId) || appData.bukuKas.find(b => (inv.metode || '').toLowerCase() === b.nama.toLowerCase());
             if (buku) {
                 buku.saldo -= total;
             }
@@ -2745,6 +3094,8 @@
         function buildInvoicePreviewHTML(inv) {
             const total = hitungTotalInvoice(inv.items);
             const isPaid = inv.status === 'paid';
+            const S = getSetting();
+            const contactLine = getContactLine();
             const paymentAcc = inv.paymentAccountId ? appData.bukuKas.find(b => b.id === inv.paymentAccountId) : null;
             const itemsHtml = inv.items.map((item, idx) => {
                 const subtotal = (item.qty * item.harga) - item.diskon;
@@ -2764,10 +3115,11 @@
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #6366f1;margin-bottom:20px;">
                         <div>
                         <div style="display:flex;align-items:center;gap:10px;">
-                            <img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA" style="height:28px;border-radius:6px;">
+                            <img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="${S.namaUsaha}" style="height:28px;border-radius:6px;">
                             <div>
-                                <div style="font-size:20px;font-weight:800;color:#0f172a;">SABINTA</div>
-                                <div style="font-size:10px;color:#94a3b8;">THE RIGHT SOLUTION FOR YOUR NEEDS</div>
+                                <div style="font-size:20px;font-weight:800;color:#0f172a;">${S.namaUsaha}</div>
+                                <div style="font-size:10px;color:#94a3b8;">${S.tagline || ''}</div>
+                                ${contactLine ? `<div style="font-size:9px;color:#94a3b8;">${contactLine}</div>` : ''}
                             </div>
                         </div>
                         </div>
@@ -2807,7 +3159,7 @@
                             ${isPaid ? `
                             <div style="padding:14px;background:#f8fafc;border:1px solid rgba(99,102,241,0.08);border-radius:10px;">
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(inv.nomor)}" alt="QR" style="width:90px;height:90px;display:block;margin-bottom:6px;border-radius:6px;">
-                                <div style="font-size:14px;font-weight:700;color:#6366f1;letter-spacing:1px;">SABINTA</div>
+                                <div style="font-size:14px;font-weight:700;color:#6366f1;letter-spacing:1px;">${S.namaUsaha}</div>
                                 <div style="font-size:8px;color:#94a3b8;margin-top:2px;">DIGITALLY SIGNED &amp; VERIFIED</div>
                             </div>
                             ` : `
@@ -2815,7 +3167,7 @@
                                 <div style="font-size:11px;font-weight:700;color:#0f172a;margin-bottom:6px;">Pembayaran Via:</div>
                                 <div style="font-size:11px;color:#475569;margin-bottom:2px;">Bank BRI Account: <strong>683301012398536</strong> <i class="fas fa-copy" onclick="copyText('683301012398536', this)" style="font-size:10px;color:#6366f1;cursor:pointer;" title="Salin nomor rekening"></i></div>
                                 <div style="font-size:11px;color:#475569;margin-bottom:2px;">Shopeepay: <strong>083826271995</strong> <i class="fas fa-copy" onclick="copyText('083826271995', this)" style="font-size:10px;color:#6366f1;cursor:pointer;" title="Salin nomor Shopeepay"></i></div>
-                                <div style="font-size:10px;color:#94a3b8;">a.n FITRIANTO</div>
+                                <div style="font-size:10px;color:#94a3b8;">a.n ${S.namaUsaha}</div>
                             </div>
                             `}
                         </div>
@@ -2846,7 +3198,7 @@
                         ${inv.catatan}
                     </div>` : ''}
                     <div style="text-align:center;padding-top:24px;margin-top:24px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;">
-                        Terima kasih atas kepercayaan Anda &middot; THE RIGHT SOLUTION FOR YOUR NEEDS &middot; SABINTA
+                        Terima kasih atas kepercayaan Anda ${S.tagline ? '&middot; ' + S.tagline : ''} &middot; ${S.namaUsaha}
                     </div>
                 </div>
             `;
@@ -2883,6 +3235,8 @@
             const inv = appData.invoice.find(i => i.id === id);
             if (!inv) return;
             const total = hitungTotalInvoice(inv.items);
+            const S = getSetting();
+            const contactLine = getContactLine();
 
             const itemsText = inv.items.map(item =>
                 `  - ${item.nama}: ${item.qty} x Rp${item.harga.toLocaleString('id-ID')}${item.diskon > 0 ? ' (diskon Rp' + item.diskon.toLocaleString('id-ID') + ')' : ''}`
@@ -2897,11 +3251,9 @@
             ${itemsText}
 
             GRAND TOTAL: Rp${total.toLocaleString('id-ID')}
-
+            ${contactLine ? 'Kontak: ' + contactLine : ''}
             ---
-            THE RIGHT SOLUTION FOR YOUR NEEDS
-            ---
-            SABINTA`;
+            ${S.tagline ? S.tagline + ' | ' : ''}${S.namaUsaha}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -2911,9 +3263,9 @@
             } else {
                 // Fallback: copy to clipboard
                 navigator.clipboard.writeText(shareText).then(() => {
-                    alert('Detail invoice disalin ke clipboard!');
+                    showToast('Detail invoice disalin ke clipboard', 'success');
                 }).catch(() => {
-                    alert('Gagal membagikan invoice. Silakan screenshot manual.');
+                    showToast('Gagal membagikan invoice', 'error');
                 });
             }
         }
@@ -2927,6 +3279,7 @@
             else if (active.id === 'page-utang') renderUtang();
             else if (active.id === 'page-piutang') renderPiutang();
             else if (active.id === 'page-laporan') renderLaporan();
+            else if (active.id === 'page-pengaturan') { renderPengaturan(); updateSyncStatusUI(); }
         }
 
         // =============================================
