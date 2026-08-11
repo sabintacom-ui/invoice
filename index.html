@@ -1168,7 +1168,18 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // =============================================
+        // ONLINE DATABASE (SUPABASE)
+        // =============================================
+        const SUPABASE_URL = 'https://lvscmibqloscvddtgasj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2c2NtaWJxbG9zY3ZkZHRnYXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MTc2NTgsImV4cCI6MjEwMTk5MzY1OH0.VEu8DdRvat39twGGoNc6IcEQPD6qS5NoUCacQ6kePpk';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const ONLINE_STATE_ID = 'sabinta-main';
+        let onlineReady = false;
+        let onlineSyncTimer = null;
+
         // =============================================
         // DATA & STATE
         // =============================================
@@ -1185,11 +1196,12 @@
             invoice: []
         };
 
-        // Load dari localStorage
+        // Load awal dari localStorage. Setelah itu Supabase akan menjadi sumber data utama.
+        let hadLocalData = false;
         if (localStorage.getItem('sabintaPremiumData')) {
             try {
                 const saved = JSON.parse(localStorage.getItem('sabintaPremiumData'));
-                appData = saved;
+                if (saved && typeof saved === 'object') { appData = saved; hadLocalData = true; }
             } catch(e) {}
         } else {
             appData.transaksi = [
@@ -1215,7 +1227,89 @@
 
         function saveData() {
             localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
+            queueOnlineSave();
         }
+
+        function setSyncStatus(text, ok = true) {
+            let el = document.getElementById('onlineSyncStatus');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'onlineSyncStatus';
+                el.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:9999;padding:7px 11px;border-radius:999px;background:#fff;box-shadow:0 3px 16px rgba(0,0,0,.12);font:600 11px Arial;color:#374151;';
+                document.body.appendChild(el);
+            }
+            el.textContent = text;
+            el.style.opacity = ok ? '1' : '.75';
+        }
+
+        function queueOnlineSave() {
+            if (!onlineReady) return;
+            clearTimeout(onlineSyncTimer);
+            onlineSyncTimer = setTimeout(saveOnlineData, 500);
+        }
+
+        async function saveOnlineData() {
+            if (!onlineReady) return;
+            try {
+                setSyncStatus('Menyimpan…');
+                const { error } = await supabaseClient.from('app_state').upsert({
+                    id: ONLINE_STATE_ID,
+                    data: appData,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'id' });
+                if (error) throw error;
+                setSyncStatus('✓ Tersimpan online');
+            } catch (e) {
+                console.error('Supabase save error:', e);
+                setSyncStatus('Offline / gagal sync', false);
+            }
+        }
+
+        async function loadOnlineData() {
+            try {
+                setSyncStatus('Menghubungkan…');
+                const { data, error } = await supabaseClient
+                    .from('app_state')
+                    .select('id,data,updated_at')
+                    .eq('id', ONLINE_STATE_ID)
+                    .maybeSingle();
+                if (error) throw error;
+
+                if (data && data.data) {
+                    appData = data.data;
+                    localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
+                    onlineReady = true;
+                    refreshCurrentPage();
+                    setSyncStatus('✓ Sinkron online');
+                } else {
+                    // Database masih kosong: migrasikan data lokal/demo pertama kali.
+                    onlineReady = true;
+                    await saveOnlineData();
+                }
+            } catch (e) {
+                console.error('Supabase load error:', e);
+                setSyncStatus('Database belum siap', false);
+            }
+        }
+
+        function subscribeOnlineChanges() {
+            supabaseClient
+                .channel('sabinta-online-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state', filter: `id=eq.${ONLINE_STATE_ID}` }, payload => {
+                    if (!payload.new || !payload.new.data) return;
+                    appData = payload.new.data;
+                    localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
+                    refreshCurrentPage();
+                    setSyncStatus('✓ Sinkron dari perangkat lain');
+                })
+                .subscribe();
+        }
+
+        // Aktifkan database online setelah UI selesai dibuat.
+        setTimeout(async () => {
+            await loadOnlineData();
+            subscribeOnlineChanges();
+        }, 100);
 
         // =============================================
         // UTILITY
