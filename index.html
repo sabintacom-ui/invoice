@@ -964,7 +964,7 @@
         <a href="#" class="menu-item" onclick="showPage('piutang')"><i class="fas fa-hand-holding-dollar"></i> Piutang</a>
         <a href="#" class="menu-item" onclick="showPage('laporan')"><i class="fas fa-chart-pie"></i> Laporan</a>
         <div class="menu-header">Akun</div>
-        <a href="#" class="menu-item"><i class="fas fa-user-cog"></i> Pengaturan</a>
+        <a href="#" class="menu-item" onclick="openModal('settings')"><i class="fas fa-user-cog"></i> Pengaturan</a>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -1184,12 +1184,7 @@
         // DATA & STATE
         // =============================================
         let appData = {
-            bukuKas: [
-                { id: 'cash', nama: 'Cash', icon: 'fa-money-bill-wave', saldo: 2300000, norek: '-' },
-                { id: 'bri', nama: 'BRI', icon: 'fa-university', saldo: 5000000, norek: '683301012398536 a.n FITRIANTO' },
-                { id: 'shopeepay', nama: 'ShopeePay', icon: 'fa-mobile-alt', saldo: 1500000, norek: '083826271995' },
-                { id: 'qris', nama: 'QRIS', icon: 'fa-qrcode', saldo: 800000, norek: 'Scan QRIS di tempat' }
-            ],
+            bukuKas: [],
             transaksi: [],
             utang: [],
             piutang: [],
@@ -1197,32 +1192,11 @@
         };
 
         // Load awal dari localStorage. Setelah itu Supabase akan menjadi sumber data utama.
-        let hadLocalData = false;
         if (localStorage.getItem('sabintaPremiumData')) {
             try {
                 const saved = JSON.parse(localStorage.getItem('sabintaPremiumData'));
-                if (saved && typeof saved === 'object') { appData = saved; hadLocalData = true; }
+                if (saved && typeof saved === 'object') { appData = saved; }
             } catch(e) {}
-        } else {
-            appData.transaksi = [
-                { id: 't1', tanggal: '2026-06-01T09:00', bukuId: 'cash', tipe: 'masuk', nominal: 1000000, kategori: 'Penjualan Buku', desc: 'Buku Laskar Pelangi' },
-                { id: 't2', tanggal: '2026-06-01T10:30', bukuId: 'gopay', tipe: 'keluar', nominal: 50000, kategori: 'Makan', desc: 'Lunch' },
-                { id: 't3', tanggal: '2026-06-02T08:00', bukuId: 'bri', tipe: 'masuk', nominal: 2000000, kategori: 'Transfer', desc: 'Bayar piutang' },
-                { id: 't4', tanggal: '2026-06-02T12:15', bukuId: 'jenius', tipe: 'keluar', nominal: 75000, kategori: 'Pulsa', desc: 'Isi ulang' },
-                { id: 't5', tanggal: '2026-06-03T07:20', bukuId: 'qris', tipe: 'masuk', nominal: 450000, kategori: 'QRIS', desc: 'Pembayaran QRIS' }
-            ];
-            appData.utang = [
-                { id: 'u1', nama: 'Toko Maju', nominal: 500000, jatuhTempo: '2026-07-01', lunas: false },
-                { id: 'u2', nama: 'PT Sejahtera', nominal: 2000000, jatuhTempo: '2026-06-20', lunas: false }
-            ];
-            appData.piutang = [
-                { id: 'p1', nama: 'Andi Customer', nominal: 750000, jatuhTempo: '2026-06-15', lunas: false }
-            ];
-            appData.invoice = [
-                { id: 'inv1', nomor: 'INV-2026-001', customer: 'PT Maju Jaya', items: [{ nama: 'Jasa Desain', qty: 1, satuan: 'project', harga: 3000000, diskon: 0 }], jatuhTempo: '2026-06-30', status: 'unpaid', paymentAccountId: 'bri', metode: '', catatan: '' },
-                { id: 'inv2', nomor: 'INV-2026-002', customer: 'CV Sejahtera', items: [{ nama: 'Pengadaan Barang', qty: 5, satuan: 'pcs', harga: 300000, diskon: 0 }], jatuhTempo: '2026-06-15', status: 'paid', paymentAccountId: 'bri', metode: 'BRI', catatan: '' }
-            ];
-            saveData();
         }
 
         function saveData() {
@@ -1310,6 +1284,17 @@
             await loadOnlineData();
             subscribeOnlineChanges();
         }, 100);
+
+        async function resetAllData() {
+            if (!confirm('Hapus SEMUA data (buku kas, transaksi, utang, piutang, invoice) dari perangkat ini dan cloud? Tindakan ini tidak bisa dibatalkan.')) return;
+            try {
+                await supabaseClient.from('app_state').delete().eq('id', ONLINE_STATE_ID);
+            } catch (e) {
+                console.error('Supabase reset error:', e);
+            }
+            localStorage.removeItem('sabintaPremiumData');
+            location.reload();
+        }
 
         // =============================================
         // UTILITY
@@ -2167,6 +2152,15 @@
                     });
                     updateInvoiceTotal();
                 }, 100);
+            } else if (mode === 'settings') {
+                title.textContent = '⚙️ Pengaturan';
+                body.innerHTML = `
+                    <div style="display:flex;flex-direction:column;gap:14px;padding:4px 0;">
+                        <div style="font-size:13px;color:#64748b;text-align:center;">Reset menghapus SELURUH data (buku kas, transaksi, utang, piutang, invoice) dari perangkat ini dan cloud. Tindakan ini tidak bisa dibatalkan.</div>
+                        <button type="button" class="btn btn-danger" onclick="resetAllData()" style="width:100%;"><i class="fas fa-trash-alt"></i> Reset Semua Data</button>
+                    </div>
+                `;
+                saveBtn.style.display = 'none';
             }
             modal.classList.add('open');
         }
