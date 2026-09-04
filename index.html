@@ -1208,6 +1208,10 @@
         const ONLINE_STATE_ID = 'sabinta-main';
         let onlineReady = false;
         let onlineSyncTimer = null;
+        let lastCloudUpdatedAt = null;
+        let isLoadingFromCloud = false;
+        let syncRetryCount = 0;
+        const MAX_SYNC_RETRIES = 5;
 
         // =============================================
         // DATA & STATE
@@ -1264,29 +1268,51 @@
         }
 
         function queueOnlineSave() {
-            if (!onlineReady) return;
+            if (!onlineReady || isLoadingFromCloud) return;
             clearTimeout(onlineSyncTimer);
             onlineSyncTimer = setTimeout(saveOnlineData, 500);
         }
 
-        async function saveOnlineData() {
+        async function saveOnlineData(retryAttempt = 0) {
             if (!onlineReady) return;
             try {
                 setSyncStatus('Menyimpan…');
+                const now = new Date().toISOString();
+                const { data: cloudRow, error: fetchErr } = await supabaseClient
+                    .from('app_state')
+                    .select('updated_at')
+                    .eq('id', ONLINE_STATE_ID)
+                    .maybeSingle();
+                if (!fetchErr && cloudRow && lastCloudUpdatedAt && cloudRow.updated_at > lastCloudUpdatedAt) {
+                    setSyncStatus('✓ Sinkron dari perangkat lain', true);
+                    await loadOnlineData();
+                    return;
+                }
                 const { error } = await supabaseClient.from('app_state').upsert({
                     id: ONLINE_STATE_ID,
                     data: appData,
-                    updated_at: new Date().toISOString()
+                    updated_at: now
                 }, { onConflict: 'id' });
                 if (error) throw error;
+                lastCloudUpdatedAt = now;
+                syncRetryCount = 0;
                 setSyncStatus('✓ Tersimpan online');
             } catch (e) {
                 console.error('Supabase save error:', e);
-                setSyncStatus('Offline / gagal sync', false);
+                if (retryAttempt < MAX_SYNC_RETRIES) {
+                    const delay = Math.min(1000 * Math.pow(2, retryAttempt), 30000);
+                    setSyncStatus(`Retry sync (${retryAttempt + 1}/${MAX_SYNC_RETRIES})…`, false);
+                    syncRetryCount = retryAttempt + 1;
+                    setTimeout(() => saveOnlineData(retryAttempt + 1), delay);
+                } else {
+                    setSyncStatus('Gagal sync – coba manual', false);
+                    syncRetryCount = 0;
+                }
             }
         }
 
         async function loadOnlineData() {
+            isLoadingFromCloud = true;
             try {
                 setSyncStatus('Menghubungkan…');
                 const { data, error } = await supabaseClient
@@ -1298,19 +1324,21 @@
 
                 if (data && data.data) {
                     appData = data.data;
+                    lastCloudUpdatedAt = data.updated_at;
                     normalizeAppData();
                     localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
                     onlineReady = true;
                     refreshCurrentPage();
                     setSyncStatus('✓ Sinkron online');
                 } else {
-                    // Database masih kosong: migrasikan data lokal/demo pertama kali.
                     onlineReady = true;
                     await saveOnlineData();
                 }
             } catch (e) {
                 console.error('Supabase load error:', e);
                 setSyncStatus('Database belum siap', false);
+            } finally {
+                isLoadingFromCloud = false;
             }
         }
 
@@ -1319,7 +1347,10 @@
                 .channel('sabinta-online-sync')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state', filter: `id=eq.${ONLINE_STATE_ID}` }, payload => {
                     if (!payload.new || !payload.new.data) return;
+                    if (payload.new.updated_at && lastCloudUpdatedAt && payload.new.updated_at <= lastCloudUpdatedAt) return;
+                    clearTimeout(onlineSyncTimer);
                     appData = payload.new.data;
+                    lastCloudUpdatedAt = payload.new.updated_at || new Date().toISOString();
                     normalizeAppData();
                     localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
                     refreshCurrentPage();
