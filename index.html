@@ -1879,10 +1879,13 @@
         @media (max-width: 768px) {
             .m-head {
                 display: flex; align-items: center; gap: 9px;
+                position: sticky; top: 0; z-index: 100;
                 background: #fff;
                 padding: 10px 16px; margin: -20px -16px 14px;
                 border-bottom: 1px solid #eef1f7;
+                transition: transform 0.28s ease;
             }
+            .m-head.hide { transform: translateY(-110%); }
             body.dark .m-head { background: #0b1220; border-bottom-color: rgba(148,163,184,0.12); }
             .m-head img { height: 26px; border-radius: 6px; }
             .m-head b { font-size: 15px; letter-spacing: 0.5px; display: block; line-height: 1.1; }
@@ -5932,8 +5935,8 @@
         // Header auto-hide: sembunyi saat scroll ke bawah, muncul saat scroll ke atas
         let _lastScrollY = 0;
         window.addEventListener('scroll', () => {
-            const h = document.querySelector('.top-header');
-            if (!h) return;
+            const h = document.querySelector('.m-head') || document.querySelector('.top-header');
+            if (!h || getComputedStyle(h).display === 'none') return;
             const y = window.scrollY || 0;
             if (y > 120 && y > _lastScrollY + 4) h.classList.add('hide');
             else if (y < _lastScrollY - 4 || y <= 120) h.classList.remove('hide');
