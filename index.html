@@ -1879,16 +1879,20 @@
         @media (max-width: 768px) {
             .m-head {
                 display: flex; align-items: center; gap: 9px;
-                position: sticky; top: 0; z-index: 100;
-                background: rgba(255,255,255,0.92);
-                backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-                padding: 9px 16px; margin: 0 -16px 14px;
+                background: #fff;
+                padding: 10px 16px; margin: -20px -16px 14px;
                 border-bottom: 1px solid #eef1f7;
             }
-            body.dark .m-head { background: rgba(11,18,32,0.92); border-bottom-color: rgba(148,163,184,0.12); }
+            body.dark .m-head { background: #0b1220; border-bottom-color: rgba(148,163,184,0.12); }
             .m-head img { height: 26px; border-radius: 6px; }
             .m-head b { font-size: 15px; letter-spacing: 0.5px; display: block; line-height: 1.1; }
             .m-head small { font-size: 8px; color: #94a3b8; letter-spacing: 0.6px; display: block; }
+            .m-head-right { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+            .m-head-right #mDate { font-size: 10px; color: #94a3b8; white-space: nowrap; }
+            .m-head-right .syncmini { font-size: 10px; }
+        }
+        @media (max-width: 480px) {
+            .m-head { margin: -16px -12px 12px; }
         }
         /* --- TEMA v9: INDIGO SEPERTI BOX TOTAL SALDO --- */
         .sidebar { background: linear-gradient(180deg, #312e81 0%, #4f46e5 55%, #6d28d9 100%); }
@@ -1916,6 +1920,16 @@
             background: linear-gradient(90deg, #0f172a 20%, #4f46e5 60%, #9333ea 90%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
+        /* --- SIDEBAR: GELAP / TERANG SAJA (default gelap) --- */
+        .sidebar { background: #0a0a0a; border-right: none; }
+        .sidebar::before { display: none; }
+        .sidebar .logo i { color: #fff; text-shadow: none; }
+        .menu-header { color: #52525b; }
+        .menu-item { color: #a1a1aa; }
+        .menu-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+        .menu-item.active { background: transparent; color: #a1a1aa; box-shadow: none; }
+        .side-theme { background: rgba(255,255,255,0.09); color: #fafafa; }
+        .side-foot { border-top-color: rgba(255,255,255,0.12); }
     </style>
 </head>
 <body>
@@ -1945,14 +1959,13 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA"><div><b>SABINTA</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div></div>
+        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA"><div><b>SABINTA</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div><div class="m-head-right"><span id="mDate"></span><span class="syncmini tag-status tag-lunas">● Online</span></div></div>
         <div style="display:none;"><span id="pageTitle">Dashboard</span><span id="tanggalHariIni"></span></div>
 
         <div class="page-wrapper">
         <!-- DASHBOARD -->
         <div id="page-dashboard">
             <div class="dash-head">
-                <div class="dash-meta"><span><i class="far fa-calendar-alt"></i> <span id="dashDate"></span></span><span class="syncmini tag-status tag-lunas">● Online</span></div>
                 <h2>Selamat Datang! 👋</h2>
                 <p>Pantau kesehatan finansial Anda.</p>
             </div>
@@ -2214,7 +2227,7 @@
             </div>
             <div id="pengaturanContent"></div>
         </div>
-            <div class="app-footer">SABINTA v3.7 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
+            <div class="app-footer">SABINTA v3.8 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
     </div>
     </div>
 
@@ -5307,17 +5320,17 @@
             showToast(dark ? 'Mode gelap aktif' : 'Mode terang aktif', 'info');
         }
 
-        // Pilihan tampilan sidebar: blue (bawaan) / dark / light
+        // Pilihan tampilan sidebar: dark (bawaan) / light
         function getSidebarMode() {
-            try { return localStorage.getItem('sabintaSide') || 'blue'; } catch(e) { return 'blue'; }
+            try { return localStorage.getItem('sabintaSide') || 'dark'; } catch(e) { return 'dark'; }
         }
         function setSidebar(mode, silent) {
-            if (mode !== 'dark' && mode !== 'light') mode = 'blue';
-            if (mode === 'blue') document.body.removeAttribute('data-side');
+            if (mode !== 'light') mode = 'dark';
+            if (mode === 'dark') document.body.removeAttribute('data-side');
             else document.body.setAttribute('data-side', mode);
             try { localStorage.setItem('sabintaSide', mode); } catch(e) {}
             document.querySelectorAll('.side-opt').forEach(b => b.classList.toggle('active', b.dataset.side === mode));
-            if (!silent) showToast('Sidebar: ' + (mode === 'blue' ? 'Oreo' : mode === 'dark' ? 'Gelap' : 'Terang'), 'info');
+            if (!silent) showToast('Sidebar: ' + (mode === 'dark' ? 'Gelap' : 'Terang'), 'info');
         }
 
         function openTransferModal() {
@@ -5867,10 +5880,9 @@
                 d.id = 'sideWrap';
                 d.className = 'widget-box';
                 d.innerHTML = `<div class="widget-title"><i class="fas fa-palette" style="color:#22c55e;"></i> Tampilan Sidebar</div>
-                <div class="widget-sub">Coba versi gelap atau terang. Pilihan tersimpan di perangkat ini.</div>
+                <div class="widget-sub">Gelap bawaan, atau terang. Tersimpan di perangkat ini.</div>
                 <div style="display:flex;gap:8px;">
-                    <button class="side-opt${cur==='blue'?' active':''}" data-side="blue" onclick="setSidebar('blue')"><span class="dot" style="background:#0a0a0a;border:1px solid #e2e8f0;"></span>Oreo</button>
-                    <button class="side-opt${cur==='dark'?' active':''}" data-side="dark" onclick="setSidebar('dark')"><span class="dot" style="background:#0c1322;border:1px solid #e2e8f0;"></span>Gelap</button>
+                    <button class="side-opt${cur==='dark'?' active':''}" data-side="dark" onclick="setSidebar('dark')"><span class="dot" style="background:#0a0a0a;border:1px solid #e2e8f0;"></span>Gelap</button>
                     <button class="side-opt${cur==='light'?' active':''}" data-side="light" onclick="setSidebar('light')"><span class="dot" style="background:#ffffff;border:1px solid #cbd5e1;"></span>Terang</button>
                 </div>`;
                 c.appendChild(d);
@@ -5892,7 +5904,7 @@
                 <label>Rekening (format: Nama|Nomor, pisah baris)</label><textarea id="s_payments" rows="3" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:10px;">${(S.payments||[]).map(x=>x.nama+'|'+x.nomor).join('\n')}</textarea>
                 <label>Kategori transaksi (pisah koma)</label><input type="text" id="s_kategori" value="${escapeHtml((S.kategori||[]).join(', '))}">
                 <div class="modal-actions"><button class="btn btn-primary" onclick="savePaySettings()"><i class="fas fa-save"></i> Simpan</button></div>
-                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v3.7:</b> header logo mobile, tema indigo Total Saldo, cache anti-basi, notif error.<br>v3.6: invoice urut terbaru, tombol ✕ popup.</div>`;
+                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v3.8:</b> header logo mobile + tgl/online kanan, sidebar gelap/terang saja.<br>v3.7: tema indigo, cache anti-basi.</div>`;
                 c.appendChild(d);
             }
             if (c && !document.getElementById('hargaEditWrap')) {
@@ -5941,8 +5953,8 @@
         // INISIALISASI
         // =============================================
         document.getElementById('tanggalHariIni').textContent = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-        const dd = document.getElementById('dashDate');
-        if (dd) dd.textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+        const md = document.getElementById('mDate');
+        if (md) md.textContent = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         initTheme();
         renderDashboard();
     </script>
