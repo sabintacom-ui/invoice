@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SABINTA - The Right Solution For Your Needs</title>
-    <meta name="theme-color" content="#0a0a0a">
+    <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
@@ -1874,6 +1874,48 @@
         .stat-card .stat-label, .pct-stat .pct-label { color: rgba(255,255,255,0.85); }
         .stat-card .stat-value, .pct-stat .pct-value { color: #fff; }
         .stat-card .stat-change, .pct-stat .pct-change { background: rgba(255,255,255,0.22); color: #fff; }
+        /* --- HEADER LOGO KHUSUS MOBILE --- */
+        .m-head { display: none; }
+        @media (max-width: 768px) {
+            .m-head {
+                display: flex; align-items: center; gap: 9px;
+                position: sticky; top: 0; z-index: 100;
+                background: rgba(255,255,255,0.92);
+                backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                padding: 9px 16px; margin: 0 -16px 14px;
+                border-bottom: 1px solid #eef1f7;
+            }
+            body.dark .m-head { background: rgba(11,18,32,0.92); border-bottom-color: rgba(148,163,184,0.12); }
+            .m-head img { height: 26px; border-radius: 6px; }
+            .m-head b { font-size: 15px; letter-spacing: 0.5px; display: block; line-height: 1.1; }
+            .m-head small { font-size: 8px; color: #94a3b8; letter-spacing: 0.6px; display: block; }
+        }
+        /* --- TEMA v9: INDIGO SEPERTI BOX TOTAL SALDO --- */
+        .sidebar { background: linear-gradient(180deg, #312e81 0%, #4f46e5 55%, #6d28d9 100%); }
+        .sidebar .logo i { color: #ddd6fe; text-shadow: 0 0 16px rgba(221,214,254,0.6); }
+        .side-theme { background: rgba(255,255,255,0.14); color: #ede9fe; }
+        .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 6px 18px rgba(99,102,241,0.35); }
+        .btn-export, .pct-btn-export { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .btn-export:hover, .pct-btn-export:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 4px 12px rgba(99,102,241,0.30); }
+        .bnav-fab { background: linear-gradient(135deg, #6366f1, #a855f7); border-color: #eef2ff; box-shadow: 0 8px 26px rgba(139,92,246,0.50); }
+        .page-ico { background: linear-gradient(135deg, #6366f1, #8b5cf6) !important; box-shadow: 0 4px 12px rgba(99,102,241,0.35); }
+        .buku-card:not(.buku-card-add) { background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; }
+        .buku-card-add { border-color: #6366f1 !important; color: #6366f1; }
+        body.dark .buku-card-add { border-color: #a5b4fc !important; color: #a5b4fc; }
+        .modal-box::before { background: linear-gradient(90deg, #6366f1, #8b5cf6, #d946ef); }
+        .chart-bar { background: linear-gradient(180deg, #6366f1, #4f46e5); }
+        .chart-col:nth-child(even) .chart-bar { background: linear-gradient(180deg, #a78bfa, #7c3aed); }
+        body.dark .chart-bar { background: linear-gradient(180deg, #818cf8, #6366f1); }
+        .inv-tab.active, .pct-tab.active { color: #4f46e5; }
+        .bkfilter-tab.active { background: #6366f1 !important; }
+        .inv-pagination .pages span.active, .pct-pagination .pages span.active { background: #6366f1; }
+        .inv-row .inv-kode, .pct-order-kode { color: #4f46e5; }
+        .bnav-item.active { color: #6d28d9; }
+        body.dark .bnav-item.active { color: #c4b5fd; }
+        .dash-head h2 {
+            background: linear-gradient(90deg, #0f172a 20%, #4f46e5 60%, #9333ea 90%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -1903,6 +1945,7 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
+        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA"><div><b>SABINTA</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div></div>
         <div style="display:none;"><span id="pageTitle">Dashboard</span><span id="tanggalHariIni"></span></div>
 
         <div class="page-wrapper">
@@ -2171,7 +2214,7 @@
             </div>
             <div id="pengaturanContent"></div>
         </div>
-            <div class="app-footer">SABINTA v3.6 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
+            <div class="app-footer">SABINTA v3.7 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
     </div>
     </div>
 
@@ -5849,7 +5892,7 @@
                 <label>Rekening (format: Nama|Nomor, pisah baris)</label><textarea id="s_payments" rows="3" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:10px;">${(S.payments||[]).map(x=>x.nama+'|'+x.nomor).join('\n')}</textarea>
                 <label>Kategori transaksi (pisah koma)</label><input type="text" id="s_kategori" value="${escapeHtml((S.kategori||[]).join(', '))}">
                 <div class="modal-actions"><button class="btn btn-primary" onclick="savePaySettings()"><i class="fas fa-save"></i> Simpan</button></div>
-                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v3.6:</b> invoice urut terbaru, form order divalidasi + total menonjol, tombol ✕ di popup, kotak statistik gradasi.<br>v3.5: tema Oreo.</div>`;
+                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v3.7:</b> header logo mobile, tema indigo Total Saldo, cache anti-basi, notif error.<br>v3.6: invoice urut terbaru, tombol ✕ popup.</div>`;
                 c.appendChild(d);
             }
             if (c && !document.getElementById('hargaEditWrap')) {
@@ -5884,6 +5927,15 @@
             else if (y < _lastScrollY - 4 || y <= 120) h.classList.remove('hide');
             _lastScrollY = y;
         }, { passive: true });
+
+        // Penangkap error global: tampilkan toast agar galat tidak diam-diam mengosongkan halaman
+        let _lastErrToast = 0;
+        window.addEventListener('error', e => {
+            const now = Date.now();
+            if (now - _lastErrToast < 8000) return;
+            _lastErrToast = now;
+            try { showToast('Galat: ' + String(e.message || 'unknown').slice(0, 70), 'error'); } catch (_) {}
+        });
 
         // =============================================
         // INISIALISASI
