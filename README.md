@@ -1,6 +1,6 @@
-# SABINTA — Sistem Invoice & Keuangan
+# FITRIANTO — Sistem Invoice & Keuangan
 
-Aplikasi web (single-file `index.html`) untuk usaha Sabinta: Buku Kas, Invoice,
+Aplikasi web (single-file `index.html`) untuk usaha Fitrianto: Buku Kas, Invoice,
 Percetakan, Utang/Piutang, Laporan, plus sinkronisasi cloud Supabase + PWA.
 
 ## Cara menjalankan lokal

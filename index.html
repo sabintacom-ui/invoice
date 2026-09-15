@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SABINTA - The Right Solution For Your Needs</title>
+    <title>FITRIANTO - The Right Solution For Your Needs</title>
     <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="FITRIANTO — Sistem Invoice, Buku Kas, Percetakan, Utang/Piutang & Laporan. Cepat, offline-first, sinkron cloud.">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- FAVICON -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    
-    <link rel="manifest" href="/manifest.json">
+
+    <!-- FAVICON (relative agar tidak 404 saat localhost / file://) -->
+    <link rel="icon" href="./favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+
+    <link rel="manifest" href="./manifest.json">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Export Libraries -->
@@ -81,9 +86,15 @@
             display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px;
             margin-bottom: 2px; cursor: pointer; color: #94a3b8; transition: all 0.2s; text-decoration: none; font-size: 14px; font-weight: 500;
             min-height: 46px; touch-action: manipulation;
+            box-shadow: none;
         }
         .menu-item:hover { background: rgba(99,102,241,0.10); color: #e2e8f0; }
-        .menu-item.active { background: rgba(99,102,241,0.15); color: #e0e7ff; }
+        .menu-item.active { 
+            background: rgba(99,102,241,0.15); 
+            color: #e0e7ff;
+            box-shadow: none;
+            border-right: none;
+        }
         .menu-item i { width: 20px; text-align: center; font-size: 15px; }
         .menu-header { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; margin: 20px 0 6px 14px; letter-spacing: 0.8px; }
 
@@ -1475,8 +1486,13 @@
         body.dark .inv-preview-meta, body.dark .pct-detail-card { background:#0f1b30 !important; }
         body.dark .inv-preview-meta .meta-group .value { color:#f1f5f9 !important; }
         @media print {
-            .sidebar, .top-header, .fab, .modal, #toastBox, #onlineSyncStatus, .no-print { display:none !important; }
+            .sidebar, .top-header, .m-head, .bottom-nav, .fab, .modal, #toastBox, #onlineSyncStatus,
+            .app-footer, .page-head, .page-actions, .export-group, .pct-export-group,
+            .inv-filter-bar, .pct-filter-bar, .inv-pagination, .pct-pagination,
+            .inv-tabs, .pct-tabs, .sheet-overlay, .confirm-overlay, .spinner-overlay,
+            .no-print { display:none !important; }
             .main-content { padding:0 !important; background:white !important; }
+            .invoice-preview, .pct-preview { box-shadow:none !important; border:none !important; max-width:100% !important; margin:0 !important; }
             body.dark .main-content, body.dark .invoice-preview, body.dark .pct-preview { background:white !important; color:#0f172a !important; }
         }
 
@@ -1531,10 +1547,11 @@
             -webkit-mask-image: linear-gradient(180deg, black 0%, transparent 55%);
         }
         .sidebar .logo i { color: #fbbf24; text-shadow: 0 0 18px rgba(251,191,36,0.65); }
-        .menu-item.active {
-            background: linear-gradient(90deg, rgba(99,102,241,0.28), rgba(139,92,246,0.14));
+.menu-item.active {
+            background: rgba(99,102,241,0.15);
             color: #e0e7ff;
-            box-shadow: inset 2px 0 0 #a5b4fc;
+            box-shadow: none;
+            border-right: none;
         }
         /* motif titik di kartu statistik */
         .stat-card::after, .pct-stat::after {
@@ -1600,7 +1617,7 @@
         .sidebar .logo i { color: #fff; text-shadow: none; }
         .menu-item { color: #8b94a7; }
         .menu-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
-        .menu-item.active { background: rgba(255,255,255,0.10); color: #fff; box-shadow: inset 2px 0 0 #3b82f6; }
+        .menu-item.active { background: rgba(255,255,255,0.10); color: #fff; box-shadow: none; }
         .side-theme { background: rgba(255,255,255,0.08); color: #dbe4f0; }
         /* kartu statistik putih bersih */
         .stat-card, .pct-stat { background: #fff !important; color: #0b1526; border: 1px solid #e5eaf1; box-shadow: 0 1px 3px rgba(11,21,38,0.05); }
@@ -1662,7 +1679,7 @@
         }
         .menu-item.active {
             background: linear-gradient(90deg, rgba(99,102,241,0.45), rgba(168,85,247,0.25));
-            color: #fff; box-shadow: inset 2px 0 0 #c4b5fd;
+            color: #fff; box-shadow: none;
         }
         .side-theme { background: rgba(255,255,255,0.10); color: #e0e7ff; }
         /* kartu statistik gradien vivid */
@@ -1934,6 +1951,124 @@
         .menu-item.active { background: transparent; color: #a1a1aa; box-shadow: none; }
         .side-theme { background: rgba(255,255,255,0.09); color: #fafafa; }
         .side-foot { border-top-color: rgba(255,255,255,0.12); }
+        /* --- v10 MODERN 2026: glass, focus ring, motion, polish --- */
+        :root { --ring: 0 0 0 4px rgba(99,102,241,.14); --ease: cubic-bezier(.4,0,.2,1); }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .top-header { box-shadow: 0 1px 0 rgba(99,102,241,.08), 0 8px 24px rgba(15,23,42,.04); }
+        .widget-box, .table-container, .invoice-preview, .pct-preview, .pct-order-card { border-radius: 18px; }
+        th { position: sticky; top: 0; z-index: 1; }
+        .table-container { scrollbar-width: thin; }
+        .btn:focus-visible, .menu-item:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; box-shadow: var(--ring); border-color: #6366f1 !important; }
+        .menu-item { border-radius: 12px; }
+        .menu-item.active { background: linear-gradient(90deg, rgba(99,102,241,.22), rgba(139,92,246,.12)); color: #fff; box-shadow: inset 2px 0 0 #a5b4fc; }
+        .stat-card, .pct-stat, .buku-card { will-change: transform; }
+        .modal { animation: fadeIn .2s var(--ease); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #toastBox { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 40000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+        .toast { background: #0f172a; color: #fff; padding: 11px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; box-shadow: 0 12px 32px rgba(0,0,0,.25); animation: modalIn .25s var(--ease); max-width: min(92vw, 420px); text-align: center; }
+        .toast.success { background: linear-gradient(135deg, #059669, #10b981); }
+        .toast.error { background: linear-gradient(135deg, #dc2626, #ef4444); }
+        .toast.info { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+        .skeleton { background: linear-gradient(90deg, #eef2f7 25%, #e2e8f0 50%, #eef2f7 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 10px; min-height: 14px; }
+        @keyframes shimmer { to { background-position: -200% 0; } }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+        ::selection { background: rgba(99,102,241,.25); }
+        /* --- v11 FIX: popup tombol selalu terlihat + sidebar aktif per tema --- */
+        .modal { overflow-y: auto; overscroll-behavior: contain; }
+        .modal-box {
+            display: flex; flex-direction: column;
+            max-height: min(88vh, 88dvh);
+            overflow: hidden;
+        }
+        .modal-box h3 { flex-shrink: 0; padding-right: 36px; }
+        .modal-x { z-index: 5; flex-shrink: 0; }
+        #modalBody, #paymentModalBody {
+            overflow-y: auto; overscroll-behavior: contain;
+            min-height: 0; margin: 0 -4px; padding: 2px 4px 6px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-actions {
+            flex-shrink: 0;
+            margin-top: 14px; padding-top: 14px;
+            border-top: 1px solid #eef2f7;
+            background: #fff;
+        }
+        body.dark .modal-actions { background: #111c33; border-top-color: rgba(148,163,184,.15); }
+        @media (max-width: 768px) {
+            .modal { align-items: flex-end; padding: 0; }
+            .modal-box {
+                max-width: 100%; max-height: 92dvh;
+                border-radius: 22px 22px 0 0;
+                padding-bottom: calc(16px + var(--safe-bottom));
+            }
+            .modal-actions { position: static; }
+        }
+        /* sidebar: hilangkan semua garis/bar penanda di samping */
+        .sidebar .menu-item, .sidebar .menu-item.active, .sidebar .menu-item:hover {
+            box-shadow: none !important;
+        }
+        /* sidebar gelap (default): aktif = gradasi indigo */
+        .sidebar .menu-item.active {
+            background: linear-gradient(90deg, rgba(99,102,241,.38), rgba(139,92,246,.20));
+            color: #fff;
+            font-weight: 600;
+        }
+        .sidebar .menu-item.active:hover { background: linear-gradient(90deg, rgba(99,102,241,.38), rgba(139,92,246,.20)); color: #fff; }
+        body[data-side="dark"] .sidebar .menu-item.active,
+        body[data-side="dark"] .sidebar .menu-item.active:hover {
+            background: linear-gradient(90deg, rgba(99,102,241,.35), rgba(139,92,246,.16));
+            color: #fff;
+        }
+        /* sidebar terang: aktif = indigo muda */
+        body[data-side="light"] .sidebar .menu-item.active,
+        body[data-side="light"] .sidebar .menu-item.active:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+        body.dark[data-side="light"] .sidebar .menu-item.active,
+        body.dark[data-side="light"] .sidebar .menu-item.active:hover {
+            background: #1e293b;
+            color: #a5b4fc;
+        }
+        /* --- v12: box statistik invoice berwarna --- */
+        .inv-stat {
+            position: relative; overflow: hidden;
+            color: #fff; border: none !important;
+            box-shadow: 0 4px 16px rgba(15,23,42,.12);
+            transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+        }
+        .inv-stat:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(15,23,42,.18); border: none !important; }
+        .inv-stat:active { transform: scale(.97); }
+        .inv-stat:nth-child(1) { background: linear-gradient(135deg, #6366f1, #8b5cf6) !important; }
+        .inv-stat:nth-child(2) { background: linear-gradient(135deg, #2563eb, #06b6d4) !important; }
+        .inv-stat:nth-child(3) { background: linear-gradient(135deg, #10b981, #059669) !important; }
+        .inv-stat:nth-child(4) { background: linear-gradient(135deg, #f59e0b, #f43f5e) !important; }
+        .inv-stat::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background-image: radial-gradient(rgba(255,255,255,.22) 1.2px, transparent 1.4px);
+            background-size: 16px 16px;
+            mask-image: linear-gradient(115deg, transparent 40%, black 100%);
+            -webkit-mask-image: linear-gradient(115deg, transparent 40%, black 100%);
+        }
+        .inv-stat .label { color: rgba(255,255,255,.85) !important; }
+        .inv-stat .value { color: #fff !important; }
+        .inv-stat .inv-ico {
+            position: absolute; top: 12px; right: 14px;
+            width: 34px; height: 34px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,.22); color: #fff; font-size: 15px;
+        }
+        body.dark .inv-stat { border: 1px solid rgba(255,255,255,.25) !important; }
+        /* --- v13: kartu rekening gradien per akun + ikon kaca --- */
+        .buku-card:not(.buku-card-add) { color: #fff; border: 1px solid rgba(255,255,255,.25); }
+        .buku-card .icon {
+            width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+            background: rgba(255,255,255,.22);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 19px; opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -1943,7 +2078,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
-        <div class="logo"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA" style="height:28px;border-radius:6px;"> SABINTA</div>
+        <div class="logo"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="FITRIANTO" style="height:28px;border-radius:6px;"> FITRIANTO</div>
         <div style="font-size:10px; color:#64748b; padding-left:8px; margin-top:-24px; margin-bottom:24px; letter-spacing:0.5px;">THE RIGHT SOLUTION FOR YOUR NEEDS</div>
         <div class="menu-header">Menu</div>
         <a href="#" class="menu-item active" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i> Dashboard</a>
@@ -1963,7 +2098,7 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="SABINTA"><div><b>SABINTA</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div><div class="m-head-right"><span id="mDate"></span><span class="syncmini tag-status tag-lunas">● Online</span></div></div>
+        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="FITRIANTO"><div><b>FITRIANTO</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div><div class="m-head-right"><span id="mDate"></span><span class="syncmini tag-status tag-lunas">● Online</span></div></div>
         <div style="display:none;"><span id="pageTitle">Dashboard</span><span id="tanggalHariIni"></span></div>
 
         <div class="page-wrapper">
@@ -2077,7 +2212,7 @@
 
         <!-- INVOICE DETAIL -->
         <div id="page-invoice-detail" class="hidden-page">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+            <div class="no-print" style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
                 <button class="btn btn-cancel btn-sm" onclick="goBackToInvoiceList()"><i class="fas fa-arrow-left"></i> Kembali</button>
                 <div style="font-weight:700; font-size:16px; color:#0f172a;" id="invoiceDetailTitle">Detail Invoice</div>
                 <div style="flex:1;"></div>
@@ -2208,7 +2343,7 @@
 
         <!-- PERCETAKAN DETAIL -->
         <div id="page-percetakan-detail" class="hidden-page">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+            <div class="no-print" style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
                 <button class="btn btn-cancel btn-sm" onclick="goBackToPctList()"><i class="fas fa-arrow-left"></i> Kembali</button>
                 <div style="font-weight:700; font-size:16px; color:#0f172a;" id="pctDetailTitle">Detail Pesanan</div>
                 <div style="flex:1;"></div>
@@ -2231,7 +2366,7 @@
             </div>
             <div id="pengaturanContent"></div>
         </div>
-            <div class="app-footer">SABINTA v3.8 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
+            <div class="app-footer">FITRIANTO v4.0 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
     </div>
     </div>
 
@@ -2300,7 +2435,20 @@
         // =============================================
         const SUPABASE_URL = 'https://lvscmibqloscvddtgasj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2c2NtaWJxbG9zY3ZkZHRnYXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MTc2NTgsImV4cCI6MjEwMTk5MzY1OH0.VEu8DdRvat39twGGoNc6IcEQPD6qS5NoUCacQ6kePpk';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabaseClient = null;
+        try {
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.warn('Supabase CDN belum termuat — mode offline lokal.');
+            }
+        } catch (e) { console.warn('Supabase init gagal, mode offline:', e); supabaseClient = null; }
+        function supabaseReady() { return !!(supabaseClient && onlineReady !== false && supabaseClient.from); }
+        function needLib(name, globalName) {
+            if (typeof window !== 'undefined' && window[globalName]) return true;
+            try { showToast(name + ' belum termuat (offline?). Coba online lalu ulangi.', 'error'); } catch (_) {}
+            return false;
+        }
         const ONLINE_STATE_ID = 'sabinta-main';
         let onlineReady = false;
         let onlineSyncTimer = null;
@@ -2320,7 +2468,7 @@
             invoice: [],
             percetakan: [],
             setting: {
-                namaUsaha: 'SABINTA',
+                namaUsaha: 'FITRIANTO',
                 tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
                 alamat: '',
                 telepon: '',
@@ -2336,7 +2484,7 @@
                     appData = saved;
                     if (!appData.setting) {
                         appData.setting = {
-                            namaUsaha: 'SABINTA',
+                            namaUsaha: 'FITRIANTO',
                             tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
                             alamat: '',
                             telepon: '',
@@ -2346,6 +2494,9 @@
                 }
             } catch(e) {}
         }
+        // Normalisasi langsung saat boot (wajib sebelum render pertama),
+        // agar data lama/tak lengkap tidak membuat halaman kosong — online maupun offline.
+        try { normalizeAppData(); } catch(e) { console.warn('normalize boot:', e); }
 
         function saveData() {
             localStorage.setItem('sabintaPremiumData', JSON.stringify(appData));
@@ -2374,6 +2525,7 @@
 
         async function saveOnlineData(retryAttempt = 0) {
             if (!onlineReady) return;
+            if (!supabaseClient) { setSyncStatus('Offline (lokal)', false); return; }
             try {
                 setSyncStatus('Menyimpan…');
                 const now = new Date().toISOString();
@@ -2412,6 +2564,7 @@
 
         async function loadOnlineData() {
             isLoadingFromCloud = true;
+            if (!supabaseClient) { setSyncStatus('Offline (lokal)', false); isLoadingFromCloud = false; return; }
             try {
                 setSyncStatus('Menghubungkan…');
                 const { data, error } = await supabaseClient
@@ -2442,6 +2595,7 @@
         }
 
         function subscribeOnlineChanges() {
+            if (!supabaseClient) return;
             supabaseClient
                 .channel('sabinta-online-sync')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state', filter: `id=eq.${ONLINE_STATE_ID}` }, payload => {
@@ -2467,7 +2621,7 @@
         async function resetAllData() {
             if (!confirm('Hapus SEMUA data (buku kas, transaksi, utang, piutang, invoice) dari perangkat ini dan cloud? Tindakan ini tidak bisa dibatalkan.')) return;
             try {
-                await supabaseClient.from('app_state').delete().eq('id', ONLINE_STATE_ID);
+                if (supabaseClient) await supabaseClient.from('app_state').delete().eq('id', ONLINE_STATE_ID);
             } catch (e) {
                 console.error('Supabase reset error:', e);
             }
@@ -2482,13 +2636,62 @@
             appData.piutang = appData.piutang || [];
             appData.invoice = appData.invoice || [];
             appData.percetakan = appData.percetakan || [];
+            // Migrasi order cetak lama -> pastikan selalu punya items[] agar tidak error/kosong
+            const pctStatus = ['baru','proses','selesai','diambil'];
+            appData.percetakan.forEach((p, i) => {
+                if (!p.id) p.id = 'pct' + Date.now().toString(36) + i;
+                if (!Array.isArray(p.items) || !p.items.length) {
+                    const nama = p.jenisCetak || p.nama || 'Jasa Cetak';
+                    const qty = Number(p.jumlah) || 1;
+                    const harga = Number(p.hargaSatuan) || (Number(p.total) && qty ? Math.round(Number(p.total)/qty) : 0);
+                    p.items = [{ layananId:'lain', nama, qty, harga, diskon:0, satuan:'pcs' }];
+                }
+                if (!pctStatus.includes(p.status)) p.status = 'baru';
+                if (p.statusPembayaran !== 'paid') p.statusPembayaran = 'unpaid';
+                p.total = Number(p.total);
+                if (!p.total) p.total = p.items.reduce((s,x)=>s+(Number(x.qty)*Number(x.harga)-Number(x.diskon||0)),0);
+                if (!p.nomor) p.nomor = 'PCT-' + String(i+1).padStart(4,'0');
+                if (!p.tanggal) p.tanggal = new Date().toISOString().slice(0,10);
+            });
+            // Migrasi invoice lama -> items[] selalu array
+            appData.invoice.forEach((inv, i) => {
+                if (!inv.id) inv.id = 'inv' + Date.now().toString(36) + i;
+                if (!Array.isArray(inv.items)) inv.items = [];
+                if (inv.status !== 'paid') inv.status = 'unpaid';
+                if (!inv.nomor) inv.nomor = 'INV-' + String(i+1).padStart(4,'0');
+            });
             appData.setting = Object.assign({
-                namaUsaha: 'SABINTA',
+                namaUsaha: 'FITRIANTO',
                 tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
                 alamat: '',
                 telepon: '',
                 email: ''
             }, appData.setting || {});
+            // Rebrand: nama usaha lama SABINTA -> FITRIANTO (kecuali sudah diganti manual)
+            if (appData.setting.namaUsaha === 'SABINTA') appData.setting.namaUsaha = 'FITRIANTO';
+            // Rekening Blu By BCA Digital (090100225196): wajib ada, urutan BRI -> Blu -> Shopeepay
+            if (!Array.isArray(appData.setting.payments)) appData.setting.payments = [];
+            appData.setting.payments.forEach(p => {
+                if (p && String(p.nomor || '').replace(/\D/g, '') === '090100225196') p.nama = 'Blu By BCA Digital';
+            });
+            if (!appData.setting.payments.some(p => String((p && p.nomor) || '').replace(/\D/g, '') === '090100225196')) {
+                const briIdx = appData.setting.payments.findIndex(p => /bri/i.test(String((p && p.nama) || '')));
+                const blu = { nama: 'Blu By BCA Digital', nomor: '090100225196' };
+                if (briIdx >= 0) appData.setting.payments.splice(briIdx + 1, 0, blu);
+                else appData.setting.payments.unshift(blu);
+            }
+            // Rapikan urutan trio BRI, Blu, Shopeepay (rekening custom lain tetap di belakang)
+            const payOrder = (p) => {
+                const nm = String((p && p.nama) || '').toLowerCase();
+                const no = String((p && p.nomor) || '').replace(/\D/g, '');
+                if (/bri/.test(nm)) return 0;
+                if (no === '090100225196' || /blu/.test(nm)) return 1;
+                if (/shopee/.test(nm)) return 2;
+                return 3;
+            };
+            const trio = appData.setting.payments.filter(p => payOrder(p) < 3).sort((a, b) => payOrder(a) - payOrder(b));
+            const rest = appData.setting.payments.filter(p => payOrder(p) >= 3);
+            if (trio.length) appData.setting.payments = trio.concat(rest);
         }
 
         // =============================================
@@ -2497,6 +2700,7 @@
         let lastSyncLabel = 'Belum tersinkron';
 
         function renderPengaturan() {
+            try { normalizeAppData(); } catch(e) {}
             const s = appData.setting;
             document.getElementById('pengaturanContent').innerHTML = `
                 <div style="display:grid;grid-template-columns:1fr;gap:16px;">
@@ -2567,7 +2771,7 @@
         function saveSettings() {
             const val = id => document.getElementById(id) ? document.getElementById(id).value.trim() : '';
             appData.setting = {
-                namaUsaha: val('s_namaUsaha') || 'SABINTA',
+                namaUsaha: val('s_namaUsaha') || 'FITRIANTO',
                 tagline: val('s_tagline') || '',
                 alamat: val('s_alamat'),
                 telepon: val('s_telepon'),
@@ -2583,7 +2787,7 @@
             const blob = new Blob([payload], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'sabinta-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+            a.download = 'fitrianto-backup-' + new Date().toISOString().slice(0, 10) + '.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2715,6 +2919,22 @@
 
         const warnaBuku = ['#10b981','#6366f1','#8b5cf6','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316'];
 
+        // Gradien premium per rekening (kartu bank) — dipakai dengan !important
+        // agar tidak tertimpa override tema.
+        const gradienBuku = [
+            'linear-gradient(135deg,#4f46e5,#7c3aed)',
+            'linear-gradient(135deg,#0ea5e9,#0284c7)',
+            'linear-gradient(135deg,#10b981,#059669)',
+            'linear-gradient(135deg,#f59e0b,#d97706)',
+            'linear-gradient(135deg,#ef4444,#dc2626)',
+            'linear-gradient(135deg,#ec4899,#be185d)',
+            'linear-gradient(135deg,#14b8a6,#0d9488)',
+            'linear-gradient(135deg,#f97316,#ea580c)'
+        ];
+        function getGradienBuku(index) {
+            return gradienBuku[index % gradienBuku.length];
+        }
+
         const layananCetak = [
             { id: 'kartunama', nama: 'Kartu Nama', harga: 5000 },
             { id: 'banner', nama: 'Banner/Baliho', harga: 15000 },
@@ -2806,6 +3026,7 @@
         }
 
         function renderPercetakan() {
+            try { normalizeAppData(); } catch(e) {}
             renderPctStats();
             renderPctTable();
             renderPctPagination();
@@ -2821,7 +3042,8 @@
             const list = document.getElementById('pctOrderList');
 
             if (pageData.length === 0) {
-                list.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:36px 20px;background:white;border-radius:16px;border:1px dashed #cbd5e1;"><div style="font-size:44px;margin-bottom:10px;">🖨️</div><div style="font-weight:700;color:#475569;margin-bottom:4px;">Belum ada pesanan</div><div style="font-size:12px;margin-bottom:14px;">Buat pesanan cetak pertama, atau muat contoh data untuk mencoba tampilan.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"><button class="btn btn-primary btn-sm" onclick="openPctModal()"><i class="fas fa-plus"></i> Buat Pesanan</button><button class="btn btn-cancel btn-sm" onclick="loadDemoData()"><i class="fas fa-magic"></i> Muat Contoh</button></div></div>`;
+                const isFiltered = pctFilter !== 'all' || (((document.getElementById('pctSearchInput')||{}).value||'').trim() !== '');
+                list.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:36px 20px;background:white;border-radius:16px;border:1px dashed #cbd5e1;"><div style="font-size:44px;margin-bottom:10px;">🖨️</div><div style="font-weight:700;color:#475569;margin-bottom:4px;">${isFiltered ? 'Tidak ada pesanan yang cocok' : 'Belum ada pesanan'}</div><div style="font-size:12px;margin-bottom:14px;">${isFiltered ? 'Ubah filter atau kata kunci pencarian.' : 'Buat pesanan cetak pertama, atau muat contoh data untuk mencoba tampilan.'}</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">${isFiltered ? `<button class="btn btn-cancel btn-sm" onclick="resetPctFilter()"><i class="fas fa-rotate-left"></i> Tampilkan Semua</button>` : `<button class="btn btn-primary btn-sm" onclick="openPctModal()"><i class="fas fa-plus"></i> Buat Pesanan</button><button class="btn btn-cancel btn-sm" onclick="seedPctDemo()"><i class="fas fa-magic"></i> Muat Contoh</button>`}</div></div>`;
                 return;
             }
 
@@ -2879,6 +3101,44 @@
             renderPercetakan();
         }
 
+        function resetPctFilter() {
+            pctFilter = 'all';
+            pctPage = 1;
+            const s = document.getElementById('pctSearchInput');
+            if (s) s.value = '';
+            document.querySelectorAll('.pct-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
+            renderPercetakan();
+        }
+
+        // Isi 3 contoh pesanan khusus percetakan (hanya jika masih kosong)
+        function seedPctDemo() {
+            if ((appData.percetakan||[]).length) { showToast('Sudah ada data pesanan', 'info'); return; }
+            const today = new Date().toISOString().slice(0,10);
+            const year = new Date().getFullYear();
+            let seq = 0;
+            const mk = (customer, nama, layananId, qty, harga, status, bayar) => {
+                seq++;
+                const nomor = 'PCT-' + year + '-' + String(seq).padStart(3,'0');
+                return {
+                    id: 'pct' + generateId() + seq,
+                    nomor, customer, jenisCetak: nama,
+                    items: [{ layananId, nama, qty, harga, diskon: 0, satuan: 'pcs' }],
+                    jumlah: qty, hargaSatuan: harga, total: qty * harga,
+                    status, statusPembayaran: bayar, tanggal: today, jatuhTempo: '', catatan: '', metode: ''
+                };
+            };
+            appData.percetakan.push(
+                mk('Budi Santoso', 'Fotokopi A4', 'fotokopi', 100, 250, 'baru', 'unpaid'),
+                mk('Siti Aminah', 'Banner/Baliho', 'banner', 4, 15000, 'proses', 'unpaid'),
+                mk('Toko Berkah', 'Kartu Nama', 'kartunama', 5, 5000, 'selesai', 'paid')
+            );
+            saveData();
+            pctFilter = 'all'; pctPage = 1;
+            document.querySelectorAll('.pct-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
+            renderPercetakan();
+            showToast('3 contoh pesanan dimuat', 'success');
+        }
+
         // =============================================
         // SIDEBAR TOGGLE
 
@@ -2886,6 +3146,7 @@
         // RENDER
         // =============================================
         function renderDashboard() {
+            try { normalizeAppData(); } catch(e) {}
             const totalSaldo = hitungTotalSaldo();
             const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk').reduce((s, t) => s + t.nominal, 0);
             const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar').reduce((s, t) => s + t.nominal, 0);
@@ -2990,6 +3251,7 @@
         }
 
         function renderBukuKasList() {
+            try { normalizeAppData(); } catch(e) {}
             const grid = document.getElementById('bukuListGrid');
             grid.innerHTML = '';
             if (appData.bukuKas.length === 0) {
@@ -2999,7 +3261,8 @@
             appData.bukuKas.forEach((b, index) => {
                 const card = document.createElement('div');
                 card.className = 'buku-card';
-                card.style.background = getWarnaBuku(index);
+                try { card.style.setProperty('background', getGradienBuku(index), 'important'); }
+                catch(e) { card.style.background = getWarnaBuku(index); }
                 const isActive = (typeof bkRekeningFilter !== 'undefined' && bkRekeningFilter === b.id);
                 if (isActive) card.style.outline = '3px solid #0f172a';
                 card.title = isActive ? 'Klik untuk tampilkan semua' : 'Klik untuk filter transaksi rekening ini';
@@ -3070,6 +3333,7 @@
         }
 
         function renderUtang() {
+            try { normalizeAppData(); } catch(e) {}
             const listUtang = document.getElementById('listUtang');
             if (appData.utang.length === 0) {
                 listUtang.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#94a3b8;"><i class="fas fa-inbox" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4;"></i><div style="font-weight:600;">Belum ada utang</div></div>';
@@ -3097,6 +3361,7 @@
         }
 
         function renderPiutang() {
+            try { normalizeAppData(); } catch(e) {}
             const listPiutang = document.getElementById('listPiutang');
             if (appData.piutang.length === 0) {
                 listPiutang.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#94a3b8;"><i class="fas fa-inbox" style="font-size:40px;display:block;margin-bottom:12px;opacity:0.4;"></i><div style="font-weight:600;">Belum ada piutang</div></div>';
@@ -3128,6 +3393,7 @@
         const invoicePerPage = 15;
 
         function renderInvoice() {
+            try { normalizeAppData(); } catch(e) {}
             renderInvoiceStats();
             renderInvoiceTable();
             renderInvoicePagination();
@@ -3141,20 +3407,24 @@
 
             document.getElementById('invStatsGrid').innerHTML = `
                 <div class="inv-stat">
+                    <div class="inv-ico"><i class="fas fa-file-invoice"></i></div>
                     <div class="label">Total Invoice</div>
                     <div class="value">${totalInv}</div>
                 </div>
                 <div class="inv-stat">
+                    <div class="inv-ico"><i class="fas fa-chart-line"></i></div>
                     <div class="label">Total Penjualan</div>
-                    <div class="value indigo">${formatRupiah(totalSales)}</div>
+                    <div class="value">${formatRupiah(totalSales)}</div>
                 </div>
                 <div class="inv-stat">
+                    <div class="inv-ico"><i class="fas fa-circle-check"></i></div>
                     <div class="label">Sudah Dibayar</div>
-                    <div class="value green">${formatRupiah(totalPaid)}</div>
+                    <div class="value">${formatRupiah(totalPaid)}</div>
                 </div>
                 <div class="inv-stat">
+                    <div class="inv-ico"><i class="fas fa-hourglass-half"></i></div>
                     <div class="label">Belum Dibayar</div>
-                    <div class="value red">${formatRupiah(totalUnpaid)}</div>
+                    <div class="value">${formatRupiah(totalUnpaid)}</div>
                 </div>
             `;
         }
@@ -3248,6 +3518,7 @@
         }
 
         function exportInvoiceExcel() {
+            if (!needLib('Excel (XLSX)', 'XLSX')) return;
             const data = getFilteredInvoices().map(inv => {
                 const total = hitungTotalInvoice(inv.items);
                 return {
@@ -3262,7 +3533,7 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Invoice');
-            XLSX.writeFile(wb, 'data-invoice-sabinta.xlsx');
+            XLSX.writeFile(wb, 'data-invoice-fitrianto.xlsx');
         }
 
         // =============================================
@@ -3314,27 +3585,29 @@
         function renderPctDetail(id) {
             const pct = appData.percetakan.find(p => p.id === id);
             if (!pct) {
-                document.getElementById('pctDetailContent').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px;">Pesanan tidak ditemukan</div>';
+                document.getElementById('pctDetailContent').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px;">Pesanan tidak ditemukan<br><br><button class="btn btn-cancel btn-sm" onclick="goBackToPctList()">← Kembali</button></div>';
                 return;
             }
-            const total = pct.total;
+            if (!Array.isArray(pct.items)) { normalizeAppData(); }
+            const items = Array.isArray(pct.items) ? pct.items : [];
+            const total = Number(pct.total) || items.reduce((s,x)=>s+(Number(x.qty)*Number(x.harga)-Number(x.diskon||0)),0);
             const isPaid = pct.statusPembayaran === 'paid';
             const S = getSetting();
 
-            let itemsHtml = pct.items.map((item, idx) => {
-                const subtotal = (item.qty * item.harga) - item.diskon;
+            let itemsHtml = items.length ? items.map((item, idx) => {
+                const subtotal = (Number(item.qty) * Number(item.harga)) - Number(item.diskon||0);
                 return `
                     <tr>
                         <td style="width:32px;text-align:center;color:#94a3b8;">${idx + 1}</td>
-                        <td>${item.nama}</td>
-                        <td style="text-align:center;">${item.qty}</td>
-                        <td style="text-align:center;font-size:11px;color:#64748b;">${item.satuan || '-'}</td>
-                        <td style="text-align:right;">${formatRupiah(item.harga)}</td>
-                        <td style="text-align:right;">${item.diskon > 0 ? formatRupiah(item.diskon) : '-'}</td>
+                        <td>${escapeHtml(item.nama||'-')}</td>
+                        <td style="text-align:center;">${Number(item.qty)||0}</td>
+                        <td style="text-align:center;font-size:11px;color:#64748b;">${escapeHtml(item.satuan || '-')}</td>
+                        <td style="text-align:right;">${formatRupiah(Number(item.harga)||0)}</td>
+                        <td style="text-align:right;">${Number(item.diskon) > 0 ? formatRupiah(Number(item.diskon)) : '-'}</td>
                         <td style="text-align:right;font-weight:700;">${formatRupiah(subtotal)}</td>
                     </tr>
                 `;
-            }).join('');
+            }).join('') : '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:16px;">Tidak ada rincian item</td></tr>';
 
             document.getElementById('pctDetailContent').innerHTML = `
                 <div class="pct-preview" id="pctPreviewContent">
@@ -3424,6 +3697,16 @@
         function getContactLine() {
             const S = getSetting();
             return [S.alamat, S.telepon, S.email].filter(Boolean).join(' · ');
+        }
+
+        // Daftar rekening dinamis untuk invoice (dari Pengaturan; Blu By BCA Digital selalu ada)
+        function paymentRowsHtml(S) {
+            const pays = (S.payments && S.payments.length) ? S.payments : [{ nama:'BRI', nomor:'683301012398536' }, { nama:'Blu By BCA Digital', nomor:'090100225196' }, { nama:'Shopeepay', nomor:'083826271995' }];
+            return pays.map(p => {
+                const nama = escapeHtml(p.nama || 'Rekening');
+                const nomor = String(p.nomor || '').replace(/[^0-9]/g, '');
+                return `<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;"><span style="font-size:11px;color:#475569;">${nama}: <strong>${escapeHtml(p.nomor || '')}</strong></span><i class="fas fa-copy" onclick="copyText('${nomor}', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin ${nama}"></i></div>`;
+            }).join('') + `<div style="font-size:10px;color:#94a3b8;">a.n ${escapeHtml(S.namaUsaha)}</div>`;
         }
 
         function renderInvoiceDetail(id) {
@@ -3516,15 +3799,7 @@
                             ` : `
                             <div style="padding:10px 12px;background:#f8fafc;border:1px solid rgba(99,102,241,0.06);border-radius:8px;">
                                 <div style="font-size:11px;font-weight:700;color:#0f172a;margin-bottom:6px;">Pembayaran Via:</div>
-                                <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
-                                    <span style="font-size:11px;color:#475569;">Bank BRI Account: <strong>683301012398536</strong></span>
-                                    <i class="fas fa-copy" onclick="copyText('683301012398536', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin nomor rekening"></i>
-                                </div>
-                                <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
-                                    <span style="font-size:11px;color:#475569;">Shopeepay: <strong>083826271995</strong></span>
-                                    <i class="fas fa-copy" onclick="copyText('083826271995', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin nomor Shopeepay"></i>
-                                </div>
-                                <div style="font-size:10px;color:#94a3b8;">a.n ${S.namaUsaha}</div>
+                                ${paymentRowsHtml(S)}
                             </div>
                             `}
                         </div>
@@ -3568,6 +3843,7 @@
         // LAPORAN
 
         function renderLaporan() {
+            try { normalizeAppData(); } catch(e) {}
             const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk').reduce((s, t) => s + t.nominal, 0);
             const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar').reduce((s, t) => s + t.nominal, 0);
             const saldoAkhir = hitungTotalSaldo();
@@ -3602,6 +3878,7 @@
         // EXPORT FUNCTIONS
         // =============================================
         function exportPDF() {
+            if (!needLib('PDF (jsPDF)', 'jspdf') && !window.jspdf) { try { showToast('Library PDF belum termuat (offline?).', 'error'); } catch(_){} return; }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const S = getSetting();
@@ -3626,10 +3903,11 @@
                 startY: 40
             });
             
-            doc.save('laporan-keuangan-sabinta.pdf');
+            doc.save('laporan-keuangan-fitrianto.pdf');
         }
 
         function exportExcel() {
+            if (!needLib('Excel (XLSX)', 'XLSX')) return;
             const sorted = [...appData.transaksi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
             const data = sorted.map(t => ({
                 Tanggal: new Date(t.tanggal).toLocaleString('id-ID'),
@@ -3641,7 +3919,7 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
-            XLSX.writeFile(wb, 'laporan-keuangan-sabinta.xlsx');
+            XLSX.writeFile(wb, 'laporan-keuangan-fitrianto.xlsx');
         }
 
         function fabClick() {
@@ -3658,62 +3936,68 @@
         // =============================================
         // NAVIGASI
         // =============================================
-        function showPage(pageId) {
+        function showPage(pageId, el) {
+            const dash = document.getElementById('page-dashboard');
             document.querySelectorAll('.hidden-page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-dashboard').style.display = 'none';
+            if (dash) dash.style.display = 'none';
+            const titleEl = document.getElementById('pageTitle');
+            const setTitle = t => { if (titleEl) titleEl.textContent = t; };
 
             if (pageId === 'dashboard') {
-                document.getElementById('page-dashboard').style.display = 'block';
-                document.getElementById('pageTitle').textContent = 'Dashboard';
+                if (dash) dash.style.display = 'block';
+                setTitle('Dashboard');
                 renderDashboard();
                 closeSidebarOnMobile();
             } else if (pageId === 'buku-kas') {
                 document.getElementById('page-buku-kas').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Buku Kas';
+                setTitle('Buku Kas');
                 renderBukuKasList();
                 renderBukuKasTransaksi();
                 closeSidebarOnMobile();
             } else if (pageId === 'invoice') {
                 document.getElementById('page-invoice').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Invoice';
+                setTitle('Invoice');
                 renderInvoice();
                 closeSidebarOnMobile();
             } else if (pageId === 'utang') {
                 document.getElementById('page-utang').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Utang';
+                setTitle('Utang');
                 renderUtang();
                 closeSidebarOnMobile();
             } else if (pageId === 'piutang') {
                 document.getElementById('page-piutang').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Piutang';
+                setTitle('Piutang');
                 renderPiutang();
                 closeSidebarOnMobile();
             } else if (pageId === 'laporan') {
                 document.getElementById('page-laporan').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Laporan';
+                setTitle('Laporan');
                 renderLaporan();
                 closeSidebarOnMobile();
             } else if (pageId === 'pengaturan') {
                 document.getElementById('page-pengaturan').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Pengaturan';
+                setTitle('Pengaturan');
                 renderPengaturan();
                 updateSyncStatusUI();
                 closeSidebarOnMobile();
             } else if (pageId === 'percetakan') {
                 document.getElementById('page-percetakan').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Percetakan';
+                setTitle('Percetakan');
                 renderPercetakan();
                 closeSidebarOnMobile();
             } else if (pageId === 'percetakan-laporan') {
                 document.getElementById('page-percetakan').classList.add('active');
-                document.getElementById('pageTitle').textContent = 'Percetakan';
+                setTitle('Percetakan');
                 switchPctView('laporan');
                 closeSidebarOnMobile();
             }
 
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
             let menuEl = null;
-            try { if (typeof event !== 'undefined' && event && event.target && event.target.closest) menuEl = event.target.closest('.menu-item'); } catch(e) {}
+            try {
+                if (el && el.closest) menuEl = el.closest('.menu-item');
+                else if (typeof event !== 'undefined' && event && event.target && event.target.closest) menuEl = event.target.closest('.menu-item');
+            } catch(e) {}
             if (menuEl) menuEl.classList.add('active');
             else { const map = {dashboard:0,'buku-kas':1,invoice:2,percetakan:3,'percetakan-laporan':3,utang:4,piutang:5,laporan:6,pengaturan:7}; const items = document.querySelectorAll('.menu-item'); if (items[map[pageId]]) items[map[pageId]].classList.add('active'); }
             setBottomNav(pageId);
@@ -4848,8 +5132,9 @@
         // INVOICE - DOWNLOAD PDF
         // =============================================
         function downloadInvoicePDF(id) {
+            if (!window.jspdf || !window.html2canvas) { try { showToast('Library PDF belum termuat (offline?). Coba online lalu ulangi.', 'error'); } catch(_){} return; }
             const inv = appData.invoice.find(i => i.id === id);
-            if (!inv) return;
+            if (!inv) { showToast('Invoice tidak ditemukan', 'error'); return; }
 
             // Render preview dulu jika belum di halaman detail
             const previewHtml = buildInvoicePreviewHTML(inv);
@@ -4903,8 +5188,9 @@
         // PERCETAKAN - DOWNLOAD PDF
         // =============================================
         function downloadPctPDF(id) {
+            if (!window.jspdf || !window.html2canvas) { try { showToast('Library PDF belum termuat (offline?). Coba online lalu ulangi.', 'error'); } catch(_){} return; }
             const pct = appData.percetakan.find(p => p.id === id);
-            if (!pct) return;
+            if (!pct) { showToast('Pesanan tidak ditemukan', 'error'); return; }
 
             // Build preview HTML
             const previewHtml = buildPctPreviewHTML(pct);
@@ -4954,15 +5240,16 @@
         }
 
         function buildPctPreviewHTML(pct) {
-            const total = pct.total;
+            const items = Array.isArray(pct.items) ? pct.items : [];
+            const total = Number(pct.total) || items.reduce((s,x)=>s+(Number(x.qty)*Number(x.harga)-Number(x.diskon||0)),0);
             const isPaid = pct.statusPembayaran === 'paid';
             const S = getSetting();
-            const itemsHtml = pct.items.map((item, idx) => {
-                const subtotal = (item.qty * item.harga) - item.diskon;
+            const itemsHtml = items.map((item, idx) => {
+                const subtotal = (Number(item.qty) * Number(item.harga)) - Number(item.diskon||0);
                 return `<tr>
                     <td style="text-align:center;padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:11px;color:#94a3b8;">${idx + 1}</td>
-                    <td style="padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#334155;">${item.nama}</td>
-                    <td style="text-align:center;padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:12px;">${item.qty}</td>
+                    <td style="padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#334155;">${escapeHtml(item.nama||'-')}</td>
+                    <td style="text-align:center;padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:12px;">${Number(item.qty)||0}</td>
                     <td style="text-align:center;padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:11px;color:#64748b;">${item.satuan || '-'}</td>
                     <td style="text-align:right;padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:12px;">${formatRupiah(item.harga)}</td>
                     <td style="text-align:right;padding:8px 6px;border-bottom:1px solid #f1f5f9;font-size:12px;">${item.diskon > 0 ? formatRupiah(item.diskon) : '-'}</td>
@@ -5043,6 +5330,7 @@
         }
 
         function exportPctExcel() {
+            if (!needLib('Excel (XLSX)', 'XLSX')) return;
             const data = appData.percetakan.map(p => ({
                 'Kode': p.nomor,
                 'Pelanggan': p.customer,
@@ -5061,6 +5349,7 @@
         }
 
         function exportPctLaporanPDF() {
+            if (!window.jspdf) { try { showToast('Library PDF belum termuat (offline?).', 'error'); } catch(_){} return; }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const sorted = [...appData.percetakan].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
@@ -5090,6 +5379,7 @@
         }
 
         function exportPctLaporanExcel() {
+            if (!needLib('Excel (XLSX)', 'XLSX')) return;
             const sorted = [...appData.percetakan].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
             const data = sorted.map(p => ({
                 Kode: p.nomor,
@@ -5183,9 +5473,7 @@
                             ` : `
                             <div style="padding:10px 12px;background:#f8fafc;border:1px solid rgba(99,102,241,0.06);border-radius:8px;">
                                 <div style="font-size:11px;font-weight:700;color:#0f172a;margin-bottom:6px;">Pembayaran Via:</div>
-                                <div style="font-size:11px;color:#475569;margin-bottom:2px;">Bank BRI Account: <strong>683301012398536</strong> <i class="fas fa-copy" onclick="copyText('683301012398536', this)" style="font-size:10px;color:#6366f1;cursor:pointer;" title="Salin nomor rekening"></i></div>
-                                <div style="font-size:11px;color:#475569;margin-bottom:2px;">Shopeepay: <strong>083826271995</strong> <i class="fas fa-copy" onclick="copyText('083826271995', this)" style="font-size:10px;color:#6366f1;cursor:pointer;" title="Salin nomor Shopeepay"></i></div>
-                                <div style="font-size:10px;color:#94a3b8;">a.n ${S.namaUsaha}</div>
+                                ${paymentRowsHtml(S)}
                             </div>
                             `}
                         </div>
@@ -5357,6 +5645,7 @@
         }
 
         function exportBukuKasExcel() {
+            if (!needLib('Excel (XLSX)', 'XLSX')) return;
             const data = [...appData.transaksi].sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal)).map(x => ({
                 Tanggal: new Date(x.tanggal).toLocaleString('id-ID'),
                 Buku: getBukuName(x.bukuId),
@@ -5365,7 +5654,7 @@
             const ws = XLSX.utils.json_to_sheet(data.length?data:[{Info:'Belum ada transaksi'}]);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'BukuKas');
-            XLSX.writeFile(wb, 'buku-kas-sabinta.xlsx');
+            XLSX.writeFile(wb, 'buku-kas-fitrianto.xlsx');
             showToast('Export Buku Kas berhasil','success');
         }
 
@@ -5638,7 +5927,7 @@
             _oldNormalize2();
             appData.setting.pajakDefault = appData.setting.pajakDefault ?? 0;
             appData.setting.kategori = Array.isArray(appData.setting.kategori) && appData.setting.kategori.length ? appData.setting.kategori : ['Jasa Cetak','Belanja Kertas','Gaji','Sewa','Listrik','Bensin','Makan','Lainnya'];
-            appData.setting.payments = Array.isArray(appData.setting.payments) && appData.setting.payments.length ? appData.setting.payments : [{ nama:'BRI', nomor:'683301012398536' }, { nama:'Shopeepay', nomor:'083826271995' }];
+            appData.setting.payments = Array.isArray(appData.setting.payments) && appData.setting.payments.length ? appData.setting.payments : [{ nama:'BRI', nomor:'683301012398536' }, { nama:'Blu By BCA Digital', nomor:'090100225196' }, { nama:'Shopeepay', nomor:'083826271995' }];
             if (!Array.isArray(appData.setting.hargaCetak) || !appData.setting.hargaCetak.length) appData.setting.hargaCetak = JSON.parse(JSON.stringify(DEFAULT_HARGA));
             syncHargaCetak();
             (appData.utang||[]).forEach(u => { u.dibayar = Number(u.dibayar)||0; if (u.lunas) u.dibayar = Number(u.nominal)||0; u.riwayat = Array.isArray(u.riwayat)?u.riwayat:[]; });
@@ -5768,7 +6057,8 @@
                 title = 'INVOICE';
             }
             const w = window.open('', '_blank', 'width=320,height=600');
-            w.document.write(`<html><head><title>${title} ${kode}</title><style>body{margin:0;padding:8px;} .thermal{width:58mm;font-family:monospace;font-size:11px;color:#000;} .ct{text-align:center;} hr{border:none;border-top:1px dashed #000;margin:6px 0;} table{width:100%;border-collapse:collapse;font-size:11px;} td{padding:1px 0;vertical-align:top;}</style></head><body><div class="thermal"><div class="ct"><b>${escapeHtml(S.namaUsaha)}</b><br>${escapeHtml(S.tagline||'')}<br>${escapeHtml(S.telepon||'')}</div><hr><div class="ct"><b>${title}</b><br>${escapeHtml(kode)}<br>${new Date().toLocaleString('id-ID')}</div><hr><div>Plg: ${escapeHtml(cust)}</div><hr><table>${rows.map(r=>`<tr><td>${escapeHtml(r.nama)}<br>${r.qty} x</td><td align="right">${formatRupiah(r.sub)}</td></tr>`).join('')}</table><hr><table><tr><td><b>TOTAL</b></td><td align="right"><b>${formatRupiah(total)}</b></td></tr></table><hr><div class="ct">Terima kasih!<br>--- SABINTA ---</div></div><script>window.onload=()=>{window.print();};<\/script></body></html>`);
+            if (!w) { showToast('Popup diblokir browser — izinkan popup untuk struk.', 'error'); return; }
+            w.document.write(`<html><head><title>${title} ${kode}</title><style>body{margin:0;padding:8px;} .thermal{width:58mm;font-family:monospace;font-size:11px;color:#000;} .ct{text-align:center;} hr{border:none;border-top:1px dashed #000;margin:6px 0;} table{width:100%;border-collapse:collapse;font-size:11px;} td{padding:1px 0;vertical-align:top;}</style></head><body><div class="thermal"><div class="ct"><b>${escapeHtml(S.namaUsaha)}</b><br>${escapeHtml(S.tagline||'')}<br>${escapeHtml(S.telepon||'')}</div><hr><div class="ct"><b>${title}</b><br>${escapeHtml(kode)}<br>${new Date().toLocaleString('id-ID')}</div><hr><div>Plg: ${escapeHtml(cust)}</div><hr><table>${rows.map(r=>`<tr><td>${escapeHtml(r.nama)}<br>${r.qty} x</td><td align="right">${formatRupiah(r.sub)}</td></tr>`).join('')}</table><hr><table><tr><td><b>TOTAL</b></td><td align="right"><b>${formatRupiah(total)}</b></td></tr></table><hr><div class="ct">Terima kasih!<br>--- FITRIANTO ---</div></div><script>window.onload=()=>{window.print();};<\/script></body></html>`);
             w.document.close();
         }
 
@@ -5779,7 +6069,7 @@
             const csv = rows.map(r => r.join(';')).join('\n');
             const blob = new Blob([csv], { type:'text/csv' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'laporan-sabinta.csv'; a.click();
+            a.href = URL.createObjectURL(blob); a.download = 'laporan-fitrianto.csv'; a.click();
             URL.revokeObjectURL(a.href);
             showToast('CSV diunduh','success');
         }
@@ -5908,7 +6198,7 @@
                 <label>Rekening (format: Nama|Nomor, pisah baris)</label><textarea id="s_payments" rows="3" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:10px;">${(S.payments||[]).map(x=>x.nama+'|'+x.nomor).join('\n')}</textarea>
                 <label>Kategori transaksi (pisah koma)</label><input type="text" id="s_kategori" value="${escapeHtml((S.kategori||[]).join(', '))}">
                 <div class="modal-actions"><button class="btn btn-primary" onclick="savePaySettings()"><i class="fas fa-save"></i> Simpan</button></div>
-                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v3.8:</b> header logo mobile + tgl/online kanan, sidebar gelap/terang saja.<br>v3.7: tema indigo, cache anti-basi.</div>`;
+                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v4.0:</b> rebrand FITRIANTO + rekening Blu By BCA Digital otomatis.<br>v3.9: cetak fokus isi saja, migrasi data lama, box kas/invoice berwarna, popup anti-tenggelam.</div>`;
                 c.appendChild(d);
             }
             if (c && !document.getElementById('hargaEditWrap')) {
@@ -5961,6 +6251,14 @@
         if (md) md.textContent = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         initTheme();
         renderDashboard();
+        // Daftarkan service worker PWA (hanya saat http/https, bukan file://)
+        try {
+            if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW gagal:', err));
+                });
+            }
+        } catch (_) {}
     </script>
 </body>
 </html>
