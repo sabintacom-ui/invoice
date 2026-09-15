@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FITRIANTO - The Right Solution For Your Needs</title>
+    <title>Sabinta - The Right Solution For Your Needs</title>
     <meta name="theme-color" content="#4f46e5">
-    <meta name="description" content="FITRIANTO — Sistem Invoice, Buku Kas, Percetakan, Utang/Piutang & Laporan. Cepat, offline-first, sinkron cloud.">
+    <meta name="description" content="Sabinta — Sistem Invoice, Buku Kas, Percetakan, Utang/Piutang & Laporan. Cepat, offline-first, sinkron cloud.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2078,7 +2078,7 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
-        <div class="logo"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="FITRIANTO" style="height:28px;border-radius:6px;"> FITRIANTO</div>
+        <div class="logo"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="Sabinta" style="height:28px;border-radius:6px;"> Sabinta</div>
         <div style="font-size:10px; color:#64748b; padding-left:8px; margin-top:-24px; margin-bottom:24px; letter-spacing:0.5px;">THE RIGHT SOLUTION FOR YOUR NEEDS</div>
         <div class="menu-header">Menu</div>
         <a href="#" class="menu-item active" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i> Dashboard</a>
@@ -2098,7 +2098,7 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="FITRIANTO"><div><b>FITRIANTO</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div><div class="m-head-right"><span id="mDate"></span><span class="syncmini tag-status tag-lunas">● Online</span></div></div>
+        <div class="m-head"><img src="https://down-id.img.susercontent.com/file/id-11134216-82252-mh7vq164iex444" alt="Sabinta"><div><b>Sabinta</b><small>THE RIGHT SOLUTION FOR YOUR NEEDS</small></div><div class="m-head-right"><span id="mDate"></span><span class="syncmini tag-status tag-lunas">● Online</span></div></div>
         <div style="display:none;"><span id="pageTitle">Dashboard</span><span id="tanggalHariIni"></span></div>
 
         <div class="page-wrapper">
@@ -2366,7 +2366,7 @@
             </div>
             <div id="pengaturanContent"></div>
         </div>
-            <div class="app-footer">FITRIANTO v4.0 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
+            <div class="app-footer">Sabinta v4.0 &middot; Lokal + Cloud Supabase &middot; <a href="#" onclick="showPage('pengaturan',this);return false;" style="color:#6366f1;">Changelog</a></div>
     </div>
     </div>
 
@@ -2468,7 +2468,8 @@
             invoice: [],
             percetakan: [],
             setting: {
-                namaUsaha: 'FITRIANTO',
+                namaUsaha: 'Sabinta',
+                atasNama: 'Fitrianto',
                 tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
                 alamat: '',
                 telepon: '',
@@ -2484,7 +2485,8 @@
                     appData = saved;
                     if (!appData.setting) {
                         appData.setting = {
-                            namaUsaha: 'FITRIANTO',
+                            namaUsaha: 'Sabinta',
+                            atasNama: 'Fitrianto',
                             tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
                             alamat: '',
                             telepon: '',
@@ -2661,14 +2663,17 @@
                 if (!inv.nomor) inv.nomor = 'INV-' + String(i+1).padStart(4,'0');
             });
             appData.setting = Object.assign({
-                namaUsaha: 'FITRIANTO',
+                namaUsaha: 'Sabinta',
+                atasNama: 'Fitrianto',
                 tagline: 'THE RIGHT SOLUTION FOR YOUR NEEDS',
                 alamat: '',
                 telepon: '',
                 email: ''
             }, appData.setting || {});
-            // Rebrand: nama usaha lama SABINTA -> FITRIANTO (kecuali sudah diganti manual)
-            if (appData.setting.namaUsaha === 'SABINTA') appData.setting.namaUsaha = 'FITRIANTO';
+            // Branding: Sabinta (normalisasi nama lama SABINTA / FITRIANTO)
+            if (['SABINTA','FITRIANTO'].includes(String(appData.setting.namaUsaha || '').toUpperCase())) appData.setting.namaUsaha = 'Sabinta';
+            // a.n transfer di invoice: default Fitrianto (terpisah dari nama usaha)
+            if (!appData.setting.atasNama) appData.setting.atasNama = 'Fitrianto';
             // Rekening Blu By BCA Digital (090100225196): wajib ada, urutan BRI -> Blu -> Shopeepay
             if (!Array.isArray(appData.setting.payments)) appData.setting.payments = [];
             appData.setting.payments.forEach(p => {
@@ -2709,6 +2714,8 @@
                         <div class="widget-sub">Informasi ini tampil di invoice, PDF, dan laporan.</div>
                         <label>Nama Usaha</label>
                         <input type="text" id="s_namaUsaha" value="${escapeHtml(s.namaUsaha)}" placeholder="Nama usaha Anda">
+                        <label>Nama Rekening (a.n transfer di invoice)</label>
+                        <input type="text" id="s_atasNama" value="${escapeHtml(s.atasNama || 'Fitrianto')}" placeholder="Fitrianto">
                         <label>Tagline (Opsional)</label>
                         <input type="text" id="s_tagline" value="${escapeHtml(s.tagline)}" placeholder="Slogan usaha">
                         <label>Alamat</label>
@@ -2770,13 +2777,14 @@
 
         function saveSettings() {
             const val = id => document.getElementById(id) ? document.getElementById(id).value.trim() : '';
-            appData.setting = {
-                namaUsaha: val('s_namaUsaha') || 'FITRIANTO',
+            appData.setting = Object.assign({}, appData.setting, {
+                namaUsaha: val('s_namaUsaha') || 'Sabinta',
+                atasNama: val('s_atasNama') || 'Fitrianto',
                 tagline: val('s_tagline') || '',
                 alamat: val('s_alamat'),
                 telepon: val('s_telepon'),
                 email: val('s_email')
-            };
+            });
             saveData();
             showToast('Profil bisnis disimpan', 'success');
             renderPengaturan();
@@ -2787,7 +2795,7 @@
             const blob = new Blob([payload], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'fitrianto-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+            a.download = 'sabinta-backup-' + new Date().toISOString().slice(0, 10) + '.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -3533,7 +3541,7 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Invoice');
-            XLSX.writeFile(wb, 'data-invoice-fitrianto.xlsx');
+            XLSX.writeFile(wb, 'data-invoice-sabinta.xlsx');
         }
 
         // =============================================
@@ -3700,13 +3708,15 @@
         }
 
         // Daftar rekening dinamis untuk invoice (dari Pengaturan; Blu By BCA Digital selalu ada)
+        // a.n transfer pakai setting.atasNama (default Fitrianto), terpisah dari nama usaha (Sabinta)
         function paymentRowsHtml(S) {
             const pays = (S.payments && S.payments.length) ? S.payments : [{ nama:'BRI', nomor:'683301012398536' }, { nama:'Blu By BCA Digital', nomor:'090100225196' }, { nama:'Shopeepay', nomor:'083826271995' }];
+            const an = (S.atasNama || 'Fitrianto').trim() || 'Fitrianto';
             return pays.map(p => {
                 const nama = escapeHtml(p.nama || 'Rekening');
                 const nomor = String(p.nomor || '').replace(/[^0-9]/g, '');
                 return `<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;"><span style="font-size:11px;color:#475569;">${nama}: <strong>${escapeHtml(p.nomor || '')}</strong></span><i class="fas fa-copy" onclick="copyText('${nomor}', this)" style="font-size:10px;color:#6366f1;cursor:pointer;flex-shrink:0;" title="Salin ${nama}"></i></div>`;
-            }).join('') + `<div style="font-size:10px;color:#94a3b8;">a.n ${escapeHtml(S.namaUsaha)}</div>`;
+            }).join('') + `<div style="font-size:10px;color:#94a3b8;">a.n ${escapeHtml(an)}</div>`;
         }
 
         function renderInvoiceDetail(id) {
@@ -3903,7 +3913,7 @@
                 startY: 40
             });
             
-            doc.save('laporan-keuangan-fitrianto.pdf');
+            doc.save('laporan-keuangan-sabinta.pdf');
         }
 
         function exportExcel() {
@@ -3919,7 +3929,7 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
-            XLSX.writeFile(wb, 'laporan-keuangan-fitrianto.xlsx');
+            XLSX.writeFile(wb, 'laporan-keuangan-sabinta.xlsx');
         }
 
         function fabClick() {
@@ -5654,7 +5664,7 @@
             const ws = XLSX.utils.json_to_sheet(data.length?data:[{Info:'Belum ada transaksi'}]);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'BukuKas');
-            XLSX.writeFile(wb, 'buku-kas-fitrianto.xlsx');
+            XLSX.writeFile(wb, 'buku-kas-sabinta.xlsx');
             showToast('Export Buku Kas berhasil','success');
         }
 
@@ -6058,7 +6068,7 @@
             }
             const w = window.open('', '_blank', 'width=320,height=600');
             if (!w) { showToast('Popup diblokir browser — izinkan popup untuk struk.', 'error'); return; }
-            w.document.write(`<html><head><title>${title} ${kode}</title><style>body{margin:0;padding:8px;} .thermal{width:58mm;font-family:monospace;font-size:11px;color:#000;} .ct{text-align:center;} hr{border:none;border-top:1px dashed #000;margin:6px 0;} table{width:100%;border-collapse:collapse;font-size:11px;} td{padding:1px 0;vertical-align:top;}</style></head><body><div class="thermal"><div class="ct"><b>${escapeHtml(S.namaUsaha)}</b><br>${escapeHtml(S.tagline||'')}<br>${escapeHtml(S.telepon||'')}</div><hr><div class="ct"><b>${title}</b><br>${escapeHtml(kode)}<br>${new Date().toLocaleString('id-ID')}</div><hr><div>Plg: ${escapeHtml(cust)}</div><hr><table>${rows.map(r=>`<tr><td>${escapeHtml(r.nama)}<br>${r.qty} x</td><td align="right">${formatRupiah(r.sub)}</td></tr>`).join('')}</table><hr><table><tr><td><b>TOTAL</b></td><td align="right"><b>${formatRupiah(total)}</b></td></tr></table><hr><div class="ct">Terima kasih!<br>--- FITRIANTO ---</div></div><script>window.onload=()=>{window.print();};<\/script></body></html>`);
+            w.document.write(`<html><head><title>${title} ${kode}</title><style>body{margin:0;padding:8px;} .thermal{width:58mm;font-family:monospace;font-size:11px;color:#000;} .ct{text-align:center;} hr{border:none;border-top:1px dashed #000;margin:6px 0;} table{width:100%;border-collapse:collapse;font-size:11px;} td{padding:1px 0;vertical-align:top;}</style></head><body><div class="thermal"><div class="ct"><b>${escapeHtml(S.namaUsaha)}</b><br>${escapeHtml(S.tagline||'')}<br>${escapeHtml(S.telepon||'')}</div><hr><div class="ct"><b>${title}</b><br>${escapeHtml(kode)}<br>${new Date().toLocaleString('id-ID')}</div><hr><div>Plg: ${escapeHtml(cust)}</div><hr><table>${rows.map(r=>`<tr><td>${escapeHtml(r.nama)}<br>${r.qty} x</td><td align="right">${formatRupiah(r.sub)}</td></tr>`).join('')}</table><hr><table><tr><td><b>TOTAL</b></td><td align="right"><b>${formatRupiah(total)}</b></td></tr></table><hr><div class="ct">Terima kasih!<br>--- Sabinta ---</div></div><script>window.onload=()=>{window.print();};<\/script></body></html>`);
             w.document.close();
         }
 
@@ -6069,7 +6079,7 @@
             const csv = rows.map(r => r.join(';')).join('\n');
             const blob = new Blob([csv], { type:'text/csv' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'laporan-fitrianto.csv'; a.click();
+            a.href = URL.createObjectURL(blob); a.download = 'laporan-sabinta.csv'; a.click();
             URL.revokeObjectURL(a.href);
             showToast('CSV diunduh','success');
         }
@@ -6198,7 +6208,7 @@
                 <label>Rekening (format: Nama|Nomor, pisah baris)</label><textarea id="s_payments" rows="3" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:10px;">${(S.payments||[]).map(x=>x.nama+'|'+x.nomor).join('\n')}</textarea>
                 <label>Kategori transaksi (pisah koma)</label><input type="text" id="s_kategori" value="${escapeHtml((S.kategori||[]).join(', '))}">
                 <div class="modal-actions"><button class="btn btn-primary" onclick="savePaySettings()"><i class="fas fa-save"></i> Simpan</button></div>
-                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v4.0:</b> rebrand FITRIANTO + rekening Blu By BCA Digital otomatis.<br>v3.9: cetak fokus isi saja, migrasi data lama, box kas/invoice berwarna, popup anti-tenggelam.</div>`;
+                <div style="margin-top:14px;font-size:12px;color:#64748b;"><b>Changelog v4.0:</b> branding Sabinta (a.n transfer Fitrianto) + rekening Blu By BCA Digital otomatis.<br>v3.9: cetak fokus isi saja, migrasi data lama, box kas/invoice berwarna, popup anti-tenggelam.</div>`;
                 c.appendChild(d);
             }
             if (c && !document.getElementById('hargaEditWrap')) {
@@ -6259,6 +6269,60 @@
                 });
             }
         } catch (_) {}
+        // --- PWA install prompt: tombol Install di Pengaturan + deteksi iOS ---
+        let _deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            _deferredPrompt = e;
+            try { updateInstallUI(); } catch (_) {}
+        });
+        window.addEventListener('appinstalled', () => {
+            _deferredPrompt = null;
+            try { showToast('Aplikasi terinstall', 'success'); } catch (_) {}
+            try { updateInstallUI(); } catch (_) {}
+        });
+        function isIosDevice() { return /iphone|ipad|ipod/i.test(navigator.userAgent || ''); }
+        function isStandalone() { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; }
+        async function installPWA() {
+            if (_deferredPrompt) {
+                _deferredPrompt.prompt();
+                try { await _deferredPrompt.userChoice; } catch (_) {}
+                _deferredPrompt = null;
+                updateInstallUI();
+                return;
+            }
+            if (isIosDevice()) { showToast('iPhone: Share > Add to Home Screen', 'info'); return; }
+            showToast('Buka menu browser > Install / Add to Home Screen', 'info');
+        }
+        function updateInstallUI() {
+            const b = document.getElementById('pwaInstallBtn');
+            if (!b) return;
+            if (isStandalone()) { b.innerHTML = '<i class="fas fa-check"></i> Terinstall'; b.disabled = true; return; }
+            if (_deferredPrompt) { b.innerHTML = '<i class="fas fa-download"></i> Install Aplikasi'; b.disabled = false; }
+        }
+        // Kartu Install di halaman Pengaturan (ditambah tanpa ubah renderPengaturan inti)
+        (function () {
+            if (!window._oldPeng4) {
+                window._oldPeng4 = renderPengaturan;
+                renderPengaturan = function () {
+                    window._oldPeng4();
+                    const c = document.getElementById('pengaturanContent');
+                    if (c && !document.getElementById('pwaInstallWrap')) {
+                        const d = document.createElement('div');
+                        d.id = 'pwaInstallWrap';
+                        d.className = 'widget-box';
+                        d.innerHTML = `<div class="widget-title"><i class="fas fa-mobile-alt" style="color:#10b981;"></i> Install Aplikasi</div>
+                        <div class="widget-sub">Pasang Sabinta di HP agar dibuka seperti aplikasi (perlu hosting HTTPS).</div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <button class="btn btn-success" id="pwaInstallBtn" onclick="installPWA()"><i class="fas fa-download"></i> Install Aplikasi</button>
+                        </div>
+                        <div style="margin-top:10px;font-size:11px;color:#94a3b8;">Android Chrome: menu &#8942; &gt; Install app / Add to Home screen. iPhone Safari: Share &gt; Add to Home Screen.</div>`;
+                        c.insertBefore(d, c.firstChild);
+                        try { updateInstallUI(); } catch (_) {}
+                    } else { try { updateInstallUI(); } catch (_) {} }
+                };
+            }
+        })();
     </script>
 </body>
 </html>

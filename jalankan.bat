@@ -1,7 +1,7 @@
 @echo off
 cd /d "%~dp0"
 echo ======================================
-echo  FITRIANTO jalan di:
+echo  Sabinta jalan di:
 echo  http://localhost:8000
 echo  http://127.0.0.1:8000
 echo  Jangan tutup jendela ini!
