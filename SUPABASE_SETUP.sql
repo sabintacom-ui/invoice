@@ -11,27 +11,27 @@ alter table public.app_state enable row level security;
 
 -- Untuk aplikasi single-user tanpa login.
 -- Jika nanti ditambah login, policy ini sebaiknya diganti dengan policy berbasis auth.uid().
-drop policy if exists "sabinta anon read" on public.app_state;
-drop policy if exists "sabinta anon insert" on public.app_state;
-drop policy if exists "sabinta anon update" on public.app_state;
-drop policy if exists "sabinta anon delete" on public.app_state;
+drop policy if exists "sabinta auth read" on public.app_state;
+drop policy if exists "sabinta auth insert" on public.app_state;
+drop policy if exists "sabinta auth update" on public.app_state;
+drop policy if exists "sabinta auth delete" on public.app_state;
 
-create policy "sabinta anon read"
+create policy "sabinta auth read"
 on public.app_state for select
-using (true);
+using (auth.uid() is not null);
 
-create policy "sabinta anon insert"
+create policy "sabinta auth insert"
 on public.app_state for insert
-with check (true);
+with check (auth.uid() is not null);
 
-create policy "sabinta anon update"
+create policy "sabinta auth update"
 on public.app_state for update
-using (true)
-with check (true);
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
-create policy "sabinta anon delete"
+create policy "sabinta auth delete"
 on public.app_state for delete
-using (true);
+using (auth.uid() is not null);
 
 -- Aktifkan Realtime untuk sinkronisasi antar perangkat.
 alter table public.app_state replica identity full;

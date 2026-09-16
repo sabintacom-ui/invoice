@@ -484,7 +484,7 @@
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15,23,42,0.5); display: none; justify-content: center; align-items: center;
-            z-index: 500; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            z-index: 9999; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
             padding: 16px;
         }
         .modal.open { display: flex; }
@@ -2072,6 +2072,23 @@
     </style>
 </head>
 <body>
+<!-- LOGIN PAGE -->
+<div id="page-login" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg, #1e293b, #0f172a);z-index:999999;display:none;justify-content:center;align-items:center;flex-direction:column;color:white;">
+    <div style="background:white;padding:32px;border-radius:24px;width:90%;max-width:380px;color:#0f172a;box-shadow:0 24px 80px rgba(0,0,0,0.5);">
+        <h2 style="text-align:center;margin-bottom:8px;font-weight:800;font-size:24px;letter-spacing:-0.5px;">Sabinta</h2>
+        <p style="text-align:center;color:#64748b;font-size:13px;margin-bottom:24px;">Silakan login untuk mengakses data.</p>
+        
+        <label style="font-size:13px;font-weight:600;color:#475569;display:block;margin-bottom:6px;">Email</label>
+        <input type="email" id="log_email" placeholder="admin@sabinta.com" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:16px;font-size:14px;outline:none;" />
+        
+        <label style="font-size:13px;font-weight:600;color:#475569;display:block;margin-bottom:6px;">Password</label>
+        <input type="password" id="log_pass" placeholder="••••••••" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:24px;font-size:14px;outline:none;" />
+        
+        <button onclick="doAppLogin()" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:15px;border:none;background:linear-gradient(135deg, #6366f1, #4f46e5);color:white;border-radius:12px;font-weight:600;cursor:pointer;">Masuk Dashboard</button>
+        <p id="log_msg" style="color:#ef4444;font-size:12px;text-align:center;margin-top:14px;display:none;font-weight:500;"></p>
+    </div>
+</div>
+
 
     <!-- SIDEBAR OVERLAY -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -2090,6 +2107,7 @@
         <a href="#" class="menu-item" onclick="showPage('laporan')"><i class="fas fa-chart-pie"></i> Laporan</a>
         <div class="menu-header">Akun</div>
         <a href="#" class="menu-item" onclick="showPage('pengaturan')"><i class="fas fa-user-cog"></i> Pengaturan</a>
+            <a href="#" class="menu-item" style="color:#ef4444;" onclick="doAppLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         <div class="side-foot">
             <button class="side-theme" onclick="toggleTheme()" title="Mode gelap/terang"><i class="fas fa-moon" id="themeIcon"></i><span>Mode</span></button>
             <span class="syncmini tag-status tag-lunas">● Online</span>
@@ -2146,7 +2164,7 @@
                         <span class="bkfilter-tab" data-bkfilter="keluar" onclick="filterBukuKas('keluar')">KELUAR</span>
                     </div>
                     <button class="btn btn-primary btn-sm" onclick="openModal('bktransaksi')"><i class="fas fa-plus"></i> Tambah</button>
-                    <button class="btn btn-cancel btn-sm" onclick="openTransferModal()"><i class="fas fa-exchange-alt"></i> Transfer</button>
+                    <button class="btn btn-primary btn-sm" onclick="openTransferModal()"><i class="fas fa-exchange-alt"></i> Transfer</button>
                     <button class="btn-export" onclick="exportBukuKasExcel()"><i class="fas fa-file-excel"></i> Export</button>
                 </div>
             </div>
@@ -3156,8 +3174,8 @@
         function renderDashboard() {
             try { normalizeAppData(); } catch(e) {}
             const totalSaldo = hitungTotalSaldo();
-            const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk').reduce((s, t) => s + t.nominal, 0);
-            const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar').reduce((s, t) => s + t.nominal, 0);
+            const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk' && !(t.kategori && t.kategori.toLowerCase().includes('transfer'))).reduce((s, t) => s + t.nominal, 0);
+            const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar' && !(t.kategori && t.kategori.toLowerCase().includes('transfer'))).reduce((s, t) => s + t.nominal, 0);
             const totalUtang = appData.utang.filter(u => !u.lunas).reduce((s, u) => s + u.nominal, 0);
             const totalInvoiceUnpaid = appData.invoice.filter(i => i.status === 'unpaid').reduce((s, i) => s + hitungTotalInvoice(i.items), 0);
 
@@ -3854,8 +3872,8 @@
 
         function renderLaporan() {
             try { normalizeAppData(); } catch(e) {}
-            const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk').reduce((s, t) => s + t.nominal, 0);
-            const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar').reduce((s, t) => s + t.nominal, 0);
+            const totalPemasukan = appData.transaksi.filter(t => t.tipe === 'masuk' && !(t.kategori && t.kategori.toLowerCase().includes('transfer'))).reduce((s, t) => s + t.nominal, 0);
+            const totalPengeluaran = appData.transaksi.filter(t => t.tipe === 'keluar' && !(t.kategori && t.kategori.toLowerCase().includes('transfer'))).reduce((s, t) => s + t.nominal, 0);
             const saldoAkhir = hitungTotalSaldo();
 
             document.getElementById('totalPemasukan').textContent = formatRupiah(totalPemasukan);
@@ -4601,8 +4619,8 @@
             renderBkRekeningOptions();
             let data = [...appData.transaksi];
             if (typeof bkRekeningFilter !== 'undefined' && bkRekeningFilter && bkRekeningFilter !== 'all') data = data.filter(t => t.bukuId === bkRekeningFilter);
-            if (bkTransaksiFilter === 'masuk') data = data.filter(t => t.tipe === 'masuk');
-            else if (bkTransaksiFilter === 'keluar') data = data.filter(t => t.tipe === 'keluar');
+            if (bkTransaksiFilter === 'masuk') data = data.filter(t => t.tipe === 'masuk' && !(t.kategori && t.kategori.toLowerCase().includes('transfer')));
+            else if (bkTransaksiFilter === 'keluar') data = data.filter(t => t.tipe === 'keluar' && !(t.kategori && t.kategori.toLowerCase().includes('transfer')));
             data.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
             const totalPages = Math.max(1, Math.ceil(data.length / bkTransaksiPerPage));
@@ -6324,5 +6342,36 @@
             }
         })();
     </script>
+<script>
+async function doAppLogin() {
+    const em = document.getElementById('log_email').value;
+    const pw = document.getElementById('log_pass').value;
+    const msg = document.getElementById('log_msg');
+    msg.style.display = 'none';
+    if(!supabaseClient) return alert('Koneksi ke Supabase gagal/offline.');
+    const btn = event.currentTarget || document.querySelector('#page-login button'); 
+    if(btn) { btn.textContent = 'Proses...'; btn.style.opacity = '0.7'; }
+    const {error} = await supabaseClient.auth.signInWithPassword({email:em, password:pw});
+    if(btn) { btn.textContent = 'Masuk Dashboard'; btn.style.opacity = '1'; }
+    if(error){ msg.textContent = error.message; msg.style.display = 'block'; }
+    else { location.reload(); }
+}
+async function doAppLogout() {
+    if(confirm('Yakin ingin keluar?')) {
+        if(supabaseClient) await supabaseClient.auth.signOut();
+        location.reload();
+    }
+}
+if(supabaseClient && typeof supabaseClient.auth !== 'undefined') {
+    supabaseClient.auth.getSession().then(({data:{session}}) => {
+        if(!session) {
+            document.getElementById('page-login').style.display = 'flex';
+        }
+    });
+    supabaseClient.auth.onAuthStateChange((evt, session) => {
+        if(evt === 'SIGNED_IN' || evt === 'SIGNED_OUT') location.reload();
+    });
+}
+</script>
 </body>
 </html>
